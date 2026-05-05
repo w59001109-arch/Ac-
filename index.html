@@ -720,9 +720,7 @@ function calcParticleSize() {
   const d40 = meshData.find(m => m.mesh === '40');
   const d12x40_pct = (d12 ? d12.pct : 0) - (d40 ? (100 - d40.passPct + d40.pct) : 0);
   // 直接加總 20+30+40 的%
-  const frac1240 = meshData
-    .filter(m => ['20','30','40'].includes(m.mesh))
-    .reduce((s, m) => s + m.pct, 0);
+  const frac1240 = (d12 ? d12.passPct : 0) - (d40 ? d40.passPct : 0);
 
   // D10 / D60（通過%內插）
   function findD(targetPct) {
