@@ -579,12 +579,12 @@ if ('serviceWorker' in navigator) {
       <div class="ps-out-card">
         <div class="oc-label">D10</div>
         <div class="oc-val" id="ps-d10">—</div>
-        <div class="oc-unit">μm</div>
+        <div class="oc-unit">mm</div>
       </div>
       <div class="ps-out-card">
         <div class="oc-label">D60</div>
         <div class="oc-val" id="ps-d60">—</div>
-        <div class="oc-unit">μm</div>
+        <div class="oc-unit">mm</div>
       </div>
       <div class="ps-out-card highlight">
         <div class="oc-label">均勻係數 UC</div>
@@ -594,7 +594,7 @@ if ('serviceWorker' in navigator) {
       <div class="ps-out-card">
         <div class="oc-label">有效尺寸</div>
         <div class="oc-val" id="ps-eff">—</div>
-        <div class="oc-unit">μm</div>
+        <div class="oc-unit">mm</div>
       </div>
     </div>
 
@@ -781,8 +781,8 @@ function calcParticleSize() {
   // 更新數值
   document.getElementById('ps-out-carbon').textContent = carbonName;
   document.getElementById('ps-12x40').textContent = frac1240.toFixed(2) + '%';
-  document.getElementById('ps-d10').textContent = D10.toFixed(1);
-  document.getElementById('ps-d60').textContent = D60.toFixed(1);
+  document.getElementById('ps-d10').textContent = (D10/1000).toFixed(3);
+  document.getElementById('ps-d60').textContent = (D60/1000).toFixed(3);
   document.getElementById('ps-uc').textContent = UC.toFixed(3);
   document.getElementById('ps-eff').textContent = D10.toFixed(1);
 
