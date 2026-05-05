@@ -412,11 +412,11 @@ if ('serviceWorker' in navigator) {
       <div class="inp-pair">
         <div class="inp-group">
           <label>樣品重量 W (g)</label>
-          <input type="number" id="w1" placeholder="1.3168" step="0.0001">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="w1" placeholder="1.3168" oninput="ivAutoAdv(this,4)" onkeydown="ivEnterAdv(event,this)">
         </div>
         <div class="inp-group">
           <label>滴定體積 V (ml)</label>
-          <input type="number" id="v1" placeholder="12.97" step="0.01">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="v1" placeholder="12.97" oninput="ivAutoAdv(this,2)" onkeydown="ivEnterAdv(event,this)">
         </div>
       </div>
     </div>
@@ -425,11 +425,11 @@ if ('serviceWorker' in navigator) {
       <div class="inp-pair">
         <div class="inp-group">
           <label>樣品重量 W (g)</label>
-          <input type="number" id="w2" placeholder="1.5295" step="0.0001">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="w2" placeholder="1.5295" oninput="ivAutoAdv(this,4)" onkeydown="ivEnterAdv(event,this)">
         </div>
         <div class="inp-group">
           <label>滴定體積 V (ml)</label>
-          <input type="number" id="v2" placeholder="8.86" step="0.01">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="v2" placeholder="8.86" oninput="ivAutoAdv(this,2)" onkeydown="ivEnterAdv(event,this)">
         </div>
       </div>
     </div>
@@ -438,11 +438,11 @@ if ('serviceWorker' in navigator) {
       <div class="inp-pair">
         <div class="inp-group">
           <label>樣品重量 W (g)</label>
-          <input type="number" id="w3" placeholder="1.8636" step="0.0001">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="w3" placeholder="1.8636" oninput="ivAutoAdv(this,4)" onkeydown="ivEnterAdv(event,this)">
         </div>
         <div class="inp-group">
           <label>滴定體積 V (ml)</label>
-          <input type="number" id="v3" placeholder="4.45" step="0.01">
+          <input type="text" inputmode="decimal" enterkeyhint="done" id="v3" placeholder="4.45" oninput="ivAutoAdv(this,2)" onkeydown="ivEnterAdv(event,this)">
         </div>
       </div>
     </div>
@@ -532,7 +532,7 @@ if ('serviceWorker' in navigator) {
 <!-- 粒徑頁 -->
 <div id="ps" class="page">
   <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
-    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v11</span>
+    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v12</span>
   </div>
   <div class="ps-carbon-name">
     <label>碳種名稱</label>
@@ -572,7 +572,7 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <div class="card" id="ps-result" style="display:none">
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v11</span> — <span id="ps-out-carbon">—</span></div>
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v12</span> — <span id="ps-out-carbon">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -854,6 +854,26 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 document.getElementById('n2_i2').addEventListener('input', updateDisplay);
 document.getElementById('n2_na').addEventListener('input', updateDisplay);
+
+const IV_SEQ = ['w1','v1','w2','v2','w3','v3'];
+let _ivAdvTimer = null;
+function ivAutoAdv(el, decimals) {
+  const v = el.value;
+  const dot = v.indexOf('.');
+  if (dot !== -1 && v.length - dot - 1 >= decimals) { clearTimeout(_ivAdvTimer); ivAdvance(el); return; }
+  clearTimeout(_ivAdvTimer);
+  if (v.includes('.')) _ivAdvTimer = setTimeout(() => ivAdvance(el), 700);
+}
+function ivEnterAdv(e, el) {
+  if (e.key === 'Enter') { e.preventDefault(); ivAdvance(el); }
+}
+function ivAdvance(el) {
+  const i = IV_SEQ.indexOf(el.id);
+  if (i !== -1 && i + 1 < IV_SEQ.length) {
+    const next = document.getElementById(IV_SEQ[i + 1]);
+    if (next) { next.focus(); next.select(); }
+  }
+}
 
 function calcIodine() {
   const n2_i2 = +document.getElementById('n2_i2').value;
