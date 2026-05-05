@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta name="theme-color" content="#5b8def">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js')</script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#5b8def">
 <title>活性碳分析</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icon-192.png">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
 <style>
   :root {
     --bg: #0f1117;
@@ -29,38 +32,30 @@
     min-height: 100vh;
     padding: 20px 16px 40px;
   }
-  .header {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  .header h1 {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
+  .header { text-align: center; margin-bottom: 24px; }
+  .header h1 { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
+
   .tabs {
     display: flex;
     gap: 8px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
   }
   .tab {
     flex: 1;
-    padding: 10px;
+    min-width: 80px;
+    padding: 10px 6px;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 10px;
     color: var(--text-dim);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     text-align: center;
     transition: all 0.2s;
   }
-  .tab.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: #fff;
-  }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .page { display: none; }
   .page.active { display: block; }
 
@@ -197,16 +192,8 @@
     padding: 10px 6px;
     text-align: center;
   }
-  .d-label {
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-bottom: 4px;
-  }
-  .d-val {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-  }
+  .d-label { font-size: 10px; color: var(--text-dim); margin-bottom: 4px; }
+  .d-val { font-size: 13px; font-weight: 600; color: var(--text); }
 
   .calc-btn {
     display: block;
@@ -225,11 +212,7 @@
   .calc-btn:active { opacity: 0.8; }
 
   /* 水份灰份 */
-  .w-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+  .w-grid { display: flex; flex-direction: column; gap: 10px; }
   .w-card {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -253,7 +236,6 @@
 
   .res2-grid {
     display: flex;
-    flex-direction: column;
     gap: 10px;
     margin-top: 14px;
   }
@@ -268,6 +250,151 @@
   .res2-card .r-label { font-size: 12px; color: var(--text-dim); }
   .res2-card .r-val { font-size: 28px; font-weight: 700; margin-top: 6px; }
   .res2-card .r-unit { font-size: 12px; color: var(--text-dim); }
+
+  /* 粒徑頁面 */
+  .ps-carbon-name {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    margin-bottom: 16px;
+  }
+  .ps-carbon-name label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .ps-carbon-name input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    width: 100%;
+    color: var(--accent);
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+  }
+  .ps-carbon-name input:focus { border-color: var(--accent); }
+
+  .ps-mesh-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+  }
+  .ps-mesh-row .mesh-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    min-width: 50px;
+  }
+  .ps-mesh-row input {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+  }
+  .ps-mesh-row input:focus { border-color: var(--accent); }
+  .ps-mesh-row .mesh-unit {
+    font-size: 11px;
+    color: var(--text-dim);
+    min-width: 30px;
+  }
+  .ps-mesh-row .mesh-pass {
+    font-size: 11px;
+    color: var(--green);
+    min-width: 60px;
+    text-align: right;
+  }
+
+  .ps-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .ps-table th {
+    background: var(--bg);
+    color: var(--text-dim);
+    padding: 6px 4px;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .ps-table td {
+    padding: 6px 4px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  .ps-table td:first-child { color: var(--accent); font-weight: 700; }
+  .ps-table td:nth-child(2) { color: var(--text-dim); }
+  .ps-table .pass { color: var(--green); font-weight: 600; }
+  .ps-table .cum { color: var(--accent2); font-weight: 600; }
+
+  .ps-result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .ps-result-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .ps-result-card .pr-label { font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+  .ps-result-card .pr-val { font-size: 24px; font-weight: 700; color: var(--accent); }
+  .ps-result-card .pr-unit { font-size: 11px; color: var(--text-dim); }
+  .ps-result-card.highlight { border-color: var(--green); }
+  .ps-result-card.highlight .pr-val { color: var(--green); }
+
+  .add-mesh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    color: var(--text-dim);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .add-mesh-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .ps-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+  .ps-summary-row .psr-label { color: var(--text-dim); }
+  .ps-summary-row .psr-val { color: var(--text); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -279,6 +406,7 @@
 <div class="tabs">
   <div class="tab active" onclick="switchTab('iodine')">碘值</div>
   <div class="tab" onclick="switchTab('ma')">水份灰份</div>
+  <div class="tab" onclick="switchTab('ps')">粒徑</div>
 </div>
 
 <!-- 碘值頁 -->
@@ -315,7 +443,6 @@
 
   <div class="card">
     <div class="card-title">滴定資料</div>
-
     <div class="data-row">
       <div class="row-num">第 1 組</div>
       <div class="inp-pair">
@@ -329,7 +456,6 @@
         </div>
       </div>
     </div>
-
     <div class="data-row">
       <div class="row-num">第 2 組</div>
       <div class="inp-pair">
@@ -343,7 +469,6 @@
         </div>
       </div>
     </div>
-
     <div class="data-row">
       <div class="row-num">第 3 組</div>
       <div class="inp-pair">
@@ -440,18 +565,214 @@
   </div>
 </div>
 
+<!-- 粒徑頁 -->
+<div id="ps" class="page">
+  <div class="ps-carbon-name">
+    <label>碳種名稱</label>
+    <input type="text" id="ps-carbon" placeholder="1240" value="1240">
+  </div>
+
+  <div class="card">
+    <div class="card-title">篩網重量輸入 (g)</div>
+    <div id="ps-mesh-rows">
+      <!-- 動態產生 -->
+    </div>
+    <div class="ps-carbon-name" style="margin-top:8px; margin-bottom:4px;">
+      <label>總重量 W (g) — 各mesh + 底的總和</label>
+      <input type="number" id="ps-total-w" placeholder="手動輸入或自動計算" step="0.001">
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcParticleSize()">計算粒徑分佈</button>
+
+  <div class="card" id="ps-result" style="display:none">
+    <div class="card-title">📊 粒徑分佈表</div>
+    <div class="ps-summary-row">
+      <span class="psr-label">碳種</span>
+      <span class="psr-val" id="ps-out-carbon">—</span>
+    </div>
+    <div class="ps-summary-row">
+      <span class="psr-label">總重量 W</span>
+      <span class="psr-val" id="ps-out-w">— g</span>
+    </div>
+
+    <table class="ps-table">
+      <thead>
+        <tr>
+          <th>Mesh</th>
+          <th>μ (μm)</th>
+          <th>重量(g)</th>
+          <th>通過(%)</th>
+          <th>殘留(%)</th>
+          <th>累積殘留(%)</th>
+        </tr>
+      </thead>
+      <tbody id="ps-table-body">
+      </tbody>
+    </table>
+
+    <div class="ps-result-grid">
+      <div class="ps-result-card">
+        <div class="pr-label">D10</div>
+        <div class="pr-val" id="ps-d10">—</div>
+        <div class="pr-unit">μm</div>
+      </div>
+      <div class="ps-result-card">
+        <div class="pr-label">D60</div>
+        <div class="pr-val" id="ps-d60">—</div>
+        <div class="pr-unit">μm</div>
+      </div>
+      <div class="ps-result-card highlight">
+        <div class="pr-label">均勻係數 UC</div>
+        <div class="pr-val" id="ps-uc">—</div>
+        <div class="pr-unit">D60/D10</div>
+      </div>
+      <div class="ps-result-card">
+        <div class="pr-label">有效尺寸</div>
+        <div class="pr-val" id="ps-eff">—</div>
+        <div class="pr-unit">μm</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const LOG_C_TARGET = Math.log10(0.02);
+
+// 預設 mesh 設定（1240 活性碳）
+const DEFAULT_MESH = [
+  { mesh: '12', um: 1700 },
+  { mesh: '14', um: 1400 },
+  { mesh: '16', um: 1000 },
+  { mesh: '20', um: 850 },
+  { mesh: '30', um: 600 },
+  { mesh: '40', um: 425 },
+  { mesh: '底', um: 0 }
+];
 
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(name).classList.add('active');
   event.target.classList.add('active');
+  if (name === 'ps') renderMeshRows();
+}
+
+function renderMeshRows() {
+  const container = document.getElementById('ps-mesh-rows');
+  container.innerHTML = '';
+  DEFAULT_MESH.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'ps-mesh-row';
+    const passId = `ps-pass-${i}`;
+    div.innerHTML = `
+      <span class="mesh-label">${m.mesh}</span>
+      <span class="mesh-unit">${m.um}μm</span>
+      <input type="number" id="ps-w-${i}" placeholder="0.000" step="0.001" oninput="calcAutoPass()">
+      <span class="mesh-pass" id="${passId}">—</span>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function calcAutoPass() {
+  // 自動計算通過百分比（參考用，不影響最終結果）
+}
+
+function calcParticleSize() {
+  const carbonName = document.getElementById('ps-carbon').value.trim() || '1240';
+  const totalWInput = +document.getElementById('ps-total-w').value;
+
+  // 抓各 mesh 重量
+  const weights = DEFAULT_MESH.map((m, i) => {
+    const v = +document.getElementById(`ps-w-${i}`).value;
+    return isNaN(v) || v < 0 ? 0 : v;
+  });
+
+  const totalW = totalWInput > 0 ? totalWInput : weights.reduce((a, b) => a + b, 0);
+  if (totalW <= 0) {
+    alert('請輸入總重量或各 mesh 重量');
+    return;
+  }
+
+  // 計算各 mesh 百分比
+  const meshData = DEFAULT_MESH.map((m, i) => ({
+    mesh: m.mesh,
+    um: m.um,
+    weight: weights[i],
+    pct: (weights[i] / totalW) * 100
+  }));
+
+  // 計算通過百分比（該 mesh 以上的總和）
+  // 從最大往最小累加（通過 = 該 mesh 以上所有 + 底盤）
+  // "通過" = 總和 - 累積殘留
+  let cumulative = 0;
+  meshData.forEach(m => { cumulative += m.pct; m.cum_retain = cumulative; });
+  meshData.forEach(m => { m.pass_pct = 100 - m.cum_retain + m.pct; });
+
+  // 特殊處理"底"：通過% = 上一層的殘留%
+  // 重新算：通過 = 100 - 該mesh以上所有殘留
+  // 從最大往最小走，通過% = 100 - 該層及以上所有殘留%
+  let running_retain = 0;
+  meshData.forEach(m => {
+    m.cum_retain = running_retain;
+    m.pass_pct = 100 - running_retain;
+    running_retain += m.pct;
+  });
+
+  // D10 = 通過10%的粒徑
+  // D60 = 通過60%的粒徑
+  // 用內插法
+  function findD(pct) {
+    // 找通過百分比 > pct 的點，用線性內插
+    // meshData 已經是從大到小（12, 14, 16...底），通過%從高到低
+    // 需要由大到小排序（通過%從0到100）
+    // 重新建立：從底往上（通過% 0% -> 100%）
+    const reversed = [...meshData].reverse();
+    // 找到第一個通過% >= pct 的
+    for (let i = 0; i < reversed.length; i++) {
+      if (reversed[i].pass_pct >= pct) {
+        if (i === 0) return reversed[i].um;
+        // 內插
+        const prev = reversed[i - 1];
+        const curr = reversed[i];
+        const ratio = (pct - prev.pass_pct) / (curr.pass_pct - prev.pass_pct);
+        return prev.um + ratio * (curr.um - prev.um);
+      }
+    }
+    return reversed[reversed.length - 1].um;
+  }
+
+  const D10 = findD(10);
+  const D60 = findD(60);
+  const UC = D60 / D10;
+
+  // 顯示表格
+  const tbody = document.getElementById('ps-table-body');
+  tbody.innerHTML = '';
+  meshData.forEach(m => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${m.mesh}</td>
+      <td>${m.um}</td>
+      <td>${m.weight.toFixed(3)}</td>
+      <td class="pass">${m.pass_pct.toFixed(2)}%</td>
+      <td>${m.pct.toFixed(2)}%</td>
+      <td class="cum">${m.cum_retain.toFixed(2)}%</td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById('ps-out-carbon').textContent = carbonName;
+  document.getElementById('ps-out-w').textContent = totalW.toFixed(3) + ' g';
+  document.getElementById('ps-d10').textContent = D10.toFixed(1);
+  document.getElementById('ps-d60').textContent = D60.toFixed(1);
+  document.getElementById('ps-uc').textContent = UC.toFixed(3);
+  document.getElementById('ps-eff').textContent = D10.toFixed(1);
+  document.getElementById('ps-result').style.display = 'block';
 }
 
 function updateDisplay() {
-  // 根據 N2 值動態更新顯示的 Factor (A) 和 B
   const n2_i2 = +document.getElementById('n2_i2').value || 0;
   const n2_na = +document.getElementById('n2_na').value || 0;
   if (n2_i2 > 0 && n2_na > 0) {
@@ -462,8 +783,10 @@ function updateDisplay() {
   }
 }
 
-// 輸入時即時更新顯示
-document.addEventListener('DOMContentLoaded', updateDisplay);
+document.addEventListener('DOMContentLoaded', () => {
+  updateDisplay();
+  renderMeshRows();
+});
 document.getElementById('n2_i2').addEventListener('input', updateDisplay);
 document.getElementById('n2_na').addEventListener('input', updateDisplay);
 
@@ -493,18 +816,12 @@ function calcIodine() {
     return;
   }
 
-  // ===== 碘值公式（完整動態版）=====
-  // Factor (C4) = N2(I2) × 12693
-  // B (C5) = N2(Na2S2O3) × 126.93
-  // C = N2(Na2S2O3) × V / 50
-  // X/M = (Factor - DF × B × V) / W
-  const factor = n2_i2 * 12693;  // A
-  const b_val = n2_na * 126.93;   // B
+  const factor = n2_i2 * 12693;
+  const b_val = n2_na * 126.93;
 
   const C_arr = V.map(v => n2_na * v / 50);
   const XM_arr = V.map((v, i) => (factor - df * b_val * v) / W[i]);
 
-  // 檢查 X/M 是否為正
   if (XM_arr.some(x => x <= 0)) {
     alert('X/M 有負值，請檢查輸入資料是否正確');
     return;
@@ -513,19 +830,17 @@ function calcIodine() {
   const logC = C_arr.map(c => Math.log10(c));
   const logXM = XM_arr.map(x => Math.log10(x));
 
-  // 線性迴歸：log(C) vs log(X/M)
   const n = 3;
   const meanX = logC.reduce((s, v) => s + v, 0) / n;
   const meanY = logXM.reduce((s, v) => s + v, 0) / n;
   const num = logC.reduce((s, lx, i) => s + (lx - meanX) * (logXM[i] - meanY), 0);
   const den = logC.reduce((s, lx) => s + (lx - meanX) ** 2, 0);
 
-  if (den === 0) { alert('資料無法做迴歸（所有 C 值相同）'); return; }
+  if (den === 0) { alert('資料無法做迴歸'); return; }
 
   const b_slope = num / den;
   const a_int = meanY - b_slope * meanX;
 
-  // R²
   const ssRes = logXM.reduce((s, ly, i) => s + (ly - (a_int + b_slope * logC[i])) ** 2, 0);
   const ssTot = logXM.reduce((s, ly) => s + (ly - meanY) ** 2, 0);
   const r2 = ssTot > 0 ? 1 - ssRes / ssTot : 0;
@@ -533,7 +848,6 @@ function calcIodine() {
   const logResult = a_int + b_slope * LOG_C_TARGET;
   const iodineValue = Math.pow(10, logResult);
 
-  // 更新顯示
   document.getElementById('iv-val').textContent = iodineValue.toFixed(1);
   document.getElementById('iv-b').textContent = b_slope.toFixed(6);
   document.getElementById('iv-a').textContent = a_int.toFixed(6);
@@ -542,10 +856,7 @@ function calcIodine() {
   document.getElementById('iv-r2').textContent = r2.toFixed(4);
   document.getElementById('iodine-result').style.display = 'block';
 
-  // 更新頂部顯示
   updateDisplay();
-
-  // 清除滴定資料，準備下一筆
   ['w1','w2','w3','v1','v2','v3'].forEach(id => document.getElementById(id).value = '');
 }
 
@@ -567,7 +878,6 @@ function calcMA() {
   document.getElementById('ma-ash').textContent = ash.toFixed(2);
   document.getElementById('ma-result').style.display = 'block';
 
-  // 清除輸入框，準備下一筆
   ['mw1','mw2','mw3','mw4'].forEach(id => document.getElementById(id).value = '');
 }
 </script>
