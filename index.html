@@ -723,22 +723,21 @@ function calcParticleSize() {
   const frac1240 = (d12 ? d12.passPct : 0) - (d40 ? d40.passPct : 0);
 
   // D10 / D60（通過%內插）
+  // 對數內插找 D10/D60（ASTM D422 / AASHTO T88 標準法）
+  // 原理：穿過%與粒徑在對數座標上做線性內插
   function findD(targetPct) {
-    const reversed = [...meshData].reverse(); // 從底往上（通過%由低到高）
-    for (let i = 0; i < reversed.length; i++) {
-      if (reversed[i].passPct >= targetPct) {
-        if (i === 0) return reversed[i].um || reversed[i-1]?.um || 0;
-        const prev = reversed[i - 1];
-        const curr = reversed[i];
-        if (curr.passPct === prev.passPct) return curr.um || 0;
-        // Log interpolation (ASTM standard)
-        const logPrev = Math.log10(prev.um || 1);
-        const logCurr = Math.log10(curr.um || 1);
-        const ratio = (targetPct - prev.passPct) / (curr.passPct - prev.passPct);
-        return Math.pow(10, logPrev + ratio * (logCurr - logPrev));
-      }
-    }
-    return reversed[reversed.length - 1]?.um || 0;
+    // 確認 meshData 已按 mesh 由大到小排序（12→40）
+    const hi = meshData.find(m => m.passPct >= targetPct);
+    const lo = meshData.findLast
+      ? meshData.findLast(m => m.passPct < targetPct)
+      : [...meshData].reverse().find(m => m.passPct < targetPct);
+    if (!hi || !lo) return 0;
+    if (hi.passPct === lo.passPct) return hi.um || 0;
+    // 對數內插
+    const logHi = Math.log10(hi.um || 1);
+    const logLo = Math.log10(lo.um || 1);
+    const ratio = (targetPct - lo.passPct) / (hi.passPct - lo.passPct);
+    return Math.pow(10, logLo + ratio * (logHi - logLo));
   }
 
   const D10 = findD(10);
