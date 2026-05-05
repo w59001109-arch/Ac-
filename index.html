@@ -708,7 +708,7 @@ function calcParticleSize() {
   });
   // 通過% = 100 - 累積保留
   meshData.forEach(m => {
-    m.passPct = 100 - m.cumRetain + m.pct;
+    m.passPct = 100 - m.cumRetain;
   });
 
   // 12x40 mesh% = 通過12mesh - 通過40mesh以上的總和
