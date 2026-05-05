@@ -1,7 +1,7 @@
 {
   "name": "活性碳分析",
   "short_name": "碳分析",
-  "start_url": "/carbon/",
+  "start_url": "/Ac-/",
   "display": "standalone",
   "background_color": "#0f1117",
   "theme_color": "#5b8def",
