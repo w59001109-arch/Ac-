@@ -726,17 +726,21 @@ function calcParticleSize() {
   // 對數內插找 D10/D60（ASTM D422 / AASHTO T88 標準法）
   // 原理：穿過%與粒徑在對數座標上做線性內插
   function findD(targetPct) {
-    // 對數曲線擬合（Ln-Ln 迴歸），針對每筆資料實際計算 a,b 係數
-    // 原理：y = a·ln(x) + b，x=通過%，y=粒徑(um)
-    // 找到通過%涵蓋 targetPct 的相鄰兩點，做 Ln-Ln 線性迴歸
-    const hi = meshData.find(m => m.passPct > targetPct);
-    const lo = [...meshData].reverse().find(m => m.passPct < targetPct);
+    // Ln-Ln 迴歸：穿過 target% 的相鄰兩點，擬合 y=a·ln(x)+b
+    // 原理：穿過10%用 D10 區間的兩個 sieve 點擬合，穿過60%用 D60 區間
+    const valid = meshData.filter(m => m.um > 0 && m.passPct > 0 && m.passPct < 100);
+    if (valid.length < 2) return 0;
+    // 依 passPct 排序
+    const sorted = [...valid].sort((a, b) => a.passPct - b.passPct);
+    // 找到夾住 targetPct 的相鄰兩點
+    let hi = null, lo = null;
+    for (let i = sorted.length - 1; i >= 0; i--) {
+      if (sorted[i].passPct > targetPct) { hi = sorted[i]; lo = sorted[i - 1]; break; }
+    }
     if (!hi || !lo) return 0;
-    // Ln 轉換
-    const lnX1 = Math.log(hi.passPct), lnY1 = Math.log(hi.um || 1);
-    const lnX2 = Math.log(lo.passPct), lnY2 = Math.log(lo.um || 1);
-    if (Math.abs(lnX2 - lnX1) < 1e-10) return hi.um || 0;
-    // Ln-Ln 迴歸係數
+    const lnX1 = Math.log(hi.passPct), lnY1 = Math.log(hi.um);
+    const lnX2 = Math.log(lo.passPct), lnY2 = Math.log(lo.um);
+    if (Math.abs(lnX2 - lnX1) < 1e-10) return hi.um;
     const a = (lnY2 - lnY1) / (lnX2 - lnX1);
     const b = lnY1 - a * lnX1;
     return Math.pow(Math.E, a * Math.log(targetPct) + b);
