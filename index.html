@@ -566,7 +566,7 @@ if ('serviceWorker' in navigator) {
   <button class="calc-btn" onclick="calcParticleSize()">計算粒徑分佈</button>
 
   <div class="card" id="ps-result" style="display:none">
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v5</span> — <span id="ps-out-carbon">—</span></div>
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v6</span> — <span id="ps-out-carbon">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -734,8 +734,8 @@ function calcParticleSize() {
     const sorted = [...valid].sort((a, b) => a.passPct - b.passPct);
     // 找到夾住 targetPct 的相鄰兩點
     let hi = null, lo = null;
-    for (let i = sorted.length - 1; i >= 0; i--) {
-      if (sorted[i].passPct > targetPct) { hi = sorted[i]; lo = sorted[i - 1]; break; }
+    for (let i = 0; i < sorted.length; i++) {
+      if (sorted[i].passPct > targetPct) { lo = sorted[i - 1]; hi = sorted[i]; break; }
     }
     if (!hi || !lo) return 0;
     const lnX1 = Math.log(hi.passPct), lnY1 = Math.log(hi.um);
