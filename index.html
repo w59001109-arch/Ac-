@@ -566,7 +566,7 @@ if ('serviceWorker' in navigator) {
   <button class="calc-btn" onclick="calcParticleSize()">計算粒徑分佈</button>
 
   <div class="card" id="ps-result" style="display:none">
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v6</span> — <span id="ps-out-carbon">—</span></div>
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v7</span> — <span id="ps-out-carbon">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -784,7 +784,7 @@ function calcParticleSize() {
   document.getElementById('ps-d10').textContent = (D10/1000).toFixed(3);
   document.getElementById('ps-d60').textContent = (D60/1000).toFixed(3);
   document.getElementById('ps-uc').textContent = UC.toFixed(3);
-  document.getElementById('ps-eff').textContent = D10.toFixed(1);
+  document.getElementById('ps-eff').textContent = (D10/1000).toFixed(3);
 
   document.getElementById('ps-result').style.display = 'block';
 }
