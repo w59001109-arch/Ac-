@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>活性碳分析</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e0e3ed;
+    --text-dim: #8890a4;
+    --accent: #5b8def;
+    --accent2: #e07b39;
+    --green: #4caf82;
+    --red: #e05252;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 20px 16px 40px;
+  }
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .const-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .const-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 6px;
+    text-align: center;
+  }
+  .const-item label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .const-item .val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .const-item input {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    width: 100%;
+  }
+
+  .data-row {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 10px;
+    margin-bottom: 10px;
+  }
+  .row-num {
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .inp-pair {
+    display: flex;
+    gap: 8px;
+  }
+  .inp-group {
+    flex: 1;
+  }
+  .inp-group label {
+    display: block;
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .inp-group input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    width: 100%;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+  }
+  .inp-group input:focus { border-color: var(--accent); }
+
+  .result-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .result-box .label {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .result-box .value {
+    font-size: 44px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .result-box .unit {
+    font-size: 16px;
+    color: var(--text-dim);
+    margin-left: 4px;
+  }
+  .result-box .sub {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .detail-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 6px;
+    text-align: center;
+  }
+  .d-label {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .d-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .calc-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 16px;
+    transition: opacity 0.2s;
+  }
+  .calc-btn:active { opacity: 0.8; }
+
+  /* 水份灰份 */
+  .w-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .w-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+  }
+  .w-card .w-label { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
+  .w-card .w-input {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    width: 100%;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+  }
+  .w-card .w-unit { font-size: 11px; color: var(--text-dim); margin-top: 6px; text-align: center; }
+
+  .res2-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .res2-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    flex: 1;
+  }
+  .res2-card .r-label { font-size: 12px; color: var(--text-dim); }
+  .res2-card .r-val { font-size: 28px; font-weight: 700; margin-top: 6px; }
+  .res2-card .r-unit { font-size: 12px; color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🧪 活性碳分析</h1>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('iodine')">碘值</div>
+  <div class="tab" onclick="switchTab('ma')">水份灰份</div>
+</div>
+
+<!-- 碘值頁 -->
+<div id="iodine" class="page active">
+  <div class="card">
+    <div class="card-title">常數設定</div>
+    <div class="const-grid">
+      <div class="const-item">
+        <label>N₂ (I₂當量)</label>
+        <input type="number" id="n2_i2" value="0.0987" step="0.00001">
+      </div>
+      <div class="const-item">
+        <label>N₂ (Na₂S₂O₃)</label>
+        <input type="number" id="n2_na" value="0.1" step="0.00001">
+      </div>
+      <div class="const-item">
+        <label>DF</label>
+        <input type="number" id="df" value="2.2" step="0.01">
+      </div>
+      <div class="const-item">
+        <label>Factor (A)</label>
+        <div class="val" id="disp_factor">—</div>
+      </div>
+      <div class="const-item">
+        <label>B</label>
+        <div class="val" id="disp_b">—</div>
+      </div>
+      <div class="const-item">
+        <label>log(0.02)</label>
+        <div class="val">-1.6990</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">滴定資料</div>
+
+    <div class="data-row">
+      <div class="row-num">第 1 組</div>
+      <div class="inp-pair">
+        <div class="inp-group">
+          <label>樣品重量 W (g)</label>
+          <input type="number" id="w1" placeholder="1.3168" step="0.0001">
+        </div>
+        <div class="inp-group">
+          <label>滴定體積 V (ml)</label>
+          <input type="number" id="v1" placeholder="12.97" step="0.01">
+        </div>
+      </div>
+    </div>
+
+    <div class="data-row">
+      <div class="row-num">第 2 組</div>
+      <div class="inp-pair">
+        <div class="inp-group">
+          <label>樣品重量 W (g)</label>
+          <input type="number" id="w2" placeholder="1.5295" step="0.0001">
+        </div>
+        <div class="inp-group">
+          <label>滴定體積 V (ml)</label>
+          <input type="number" id="v2" placeholder="8.86" step="0.01">
+        </div>
+      </div>
+    </div>
+
+    <div class="data-row">
+      <div class="row-num">第 3 組</div>
+      <div class="inp-pair">
+        <div class="inp-group">
+          <label>樣品重量 W (g)</label>
+          <input type="number" id="w3" placeholder="1.8636" step="0.0001">
+        </div>
+        <div class="inp-group">
+          <label>滴定體積 V (ml)</label>
+          <input type="number" id="v3" placeholder="4.45" step="0.01">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcIodine()">計算碘值</button>
+
+  <div class="card" id="iodine-result" style="display:none">
+    <div class="result-box">
+      <div class="label">碘值 (Iodine Value)</div>
+      <div><span class="value" id="iv-val">—</span><span class="unit">mg/g</span></div>
+      <div class="sub">log(C) vs log(X/M) 線性迴歸</div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="d-label">斜率 b</div>
+        <div class="d-val" id="iv-b">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">截距 a</div>
+        <div class="d-val" id="iv-a">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">log(0.02)</div>
+        <div class="d-val">-1.6990</div>
+      </div>
+    </div>
+    <div class="detail-grid" style="margin-top:8px">
+      <div class="detail-item">
+        <div class="d-label">Factor (A)</div>
+        <div class="d-val" id="iv-factor">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">B</div>
+        <div class="d-val" id="iv-b2">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">R²</div>
+        <div class="d-val" id="iv-r2">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 水份灰份頁 -->
+<div id="ma" class="page">
+  <div class="card">
+    <div class="card-title">重量輸入</div>
+    <div class="w-grid">
+      <div class="w-card">
+        <div class="w-label">W1 — 坩堝重量 (g)</div>
+        <input class="w-input" type="number" id="mw1" placeholder="28.6687" step="0.0001">
+      </div>
+      <div class="w-card">
+        <div class="w-label">W2 — 樣品重量 (g)</div>
+        <input class="w-input" type="number" id="mw2" placeholder="1.386" step="0.0001">
+      </div>
+      <div class="w-card">
+        <div class="w-label">W3 — 烘乾後總重 (g)</div>
+        <input class="w-input" type="number" id="mw3" placeholder="29.8568" step="0.0001">
+      </div>
+      <div class="w-card">
+        <div class="w-label">W4 — 800°C燒後總重 (g)</div>
+        <input class="w-input" type="number" id="mw4" placeholder="28.8583" step="0.0001">
+      </div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcMA()">計算水份 & 灰份</button>
+
+  <div class="card" id="ma-result" style="display:none">
+    <div class="res2-grid">
+      <div class="res2-card">
+        <div class="r-label">水份 ( Moisture )</div>
+        <div class="r-val" id="ma-water">—</div>
+        <div class="r-unit">%</div>
+      </div>
+      <div class="res2-card">
+        <div class="r-label">灰份 ( Ash )</div>
+        <div class="r-val" id="ma-ash">—</div>
+        <div class="r-unit">%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LOG_C_TARGET = Math.log10(0.02);
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function updateDisplay() {
+  // 根據 N2 值動態更新顯示的 Factor (A) 和 B
+  const n2_i2 = +document.getElementById('n2_i2').value || 0;
+  const n2_na = +document.getElementById('n2_na').value || 0;
+  if (n2_i2 > 0 && n2_na > 0) {
+    const factor = n2_i2 * 12693;
+    const b = n2_na * 126.93;
+    document.getElementById('disp_factor').textContent = factor.toFixed(2);
+    document.getElementById('disp_b').textContent = b.toFixed(3);
+  }
+}
+
+// 輸入時即時更新顯示
+document.addEventListener('DOMContentLoaded', updateDisplay);
+document.getElementById('n2_i2').addEventListener('input', updateDisplay);
+document.getElementById('n2_na').addEventListener('input', updateDisplay);
+
+function calcIodine() {
+  const n2_i2 = +document.getElementById('n2_i2').value;
+  const n2_na = +document.getElementById('n2_na').value;
+  const df = +document.getElementById('df').value;
+
+  if (!n2_i2 || !n2_na || !df || n2_i2 <= 0 || n2_na <= 0 || df <= 0) {
+    alert('請填入所有常數（需大於 0）');
+    return;
+  }
+
+  const W = [
+    +document.getElementById('w1').value,
+    +document.getElementById('w2').value,
+    +document.getElementById('w3').value
+  ];
+  const V = [
+    +document.getElementById('v1').value,
+    +document.getElementById('v2').value,
+    +document.getElementById('v3').value
+  ];
+
+  if (W.some(isNaN) || V.some(isNaN) || W.some(w => w <= 0) || V.some(v => v <= 0)) {
+    alert('請填入所有滴定資料且需大於 0');
+    return;
+  }
+
+  // ===== 碘值公式（完整動態版）=====
+  // Factor (C4) = N2(I2) × 12693
+  // B (C5) = N2(Na2S2O3) × 126.93
+  // C = N2(Na2S2O3) × V / 50
+  // X/M = (Factor - DF × B × V) / W
+  const factor = n2_i2 * 12693;  // A
+  const b_val = n2_na * 126.93;   // B
+
+  const C_arr = V.map(v => n2_na * v / 50);
+  const XM_arr = V.map((v, i) => (factor - df * b_val * v) / W[i]);
+
+  // 檢查 X/M 是否為正
+  if (XM_arr.some(x => x <= 0)) {
+    alert('X/M 有負值，請檢查輸入資料是否正確');
+    return;
+  }
+
+  const logC = C_arr.map(c => Math.log10(c));
+  const logXM = XM_arr.map(x => Math.log10(x));
+
+  // 線性迴歸：log(C) vs log(X/M)
+  const n = 3;
+  const meanX = logC.reduce((s, v) => s + v, 0) / n;
+  const meanY = logXM.reduce((s, v) => s + v, 0) / n;
+  const num = logC.reduce((s, lx, i) => s + (lx - meanX) * (logXM[i] - meanY), 0);
+  const den = logC.reduce((s, lx) => s + (lx - meanX) ** 2, 0);
+
+  if (den === 0) { alert('資料無法做迴歸（所有 C 值相同）'); return; }
+
+  const b_slope = num / den;
+  const a_int = meanY - b_slope * meanX;
+
+  // R²
+  const ssRes = logXM.reduce((s, ly, i) => s + (ly - (a_int + b_slope * logC[i])) ** 2, 0);
+  const ssTot = logXM.reduce((s, ly) => s + (ly - meanY) ** 2, 0);
+  const r2 = ssTot > 0 ? 1 - ssRes / ssTot : 0;
+
+  const logResult = a_int + b_slope * LOG_C_TARGET;
+  const iodineValue = Math.pow(10, logResult);
+
+  // 更新顯示
+  document.getElementById('iv-val').textContent = iodineValue.toFixed(1);
+  document.getElementById('iv-b').textContent = b_slope.toFixed(6);
+  document.getElementById('iv-a').textContent = a_int.toFixed(6);
+  document.getElementById('iv-factor').textContent = factor.toFixed(2);
+  document.getElementById('iv-b2').textContent = b_val.toFixed(3);
+  document.getElementById('iv-r2').textContent = r2.toFixed(4);
+  document.getElementById('iodine-result').style.display = 'block';
+
+  // 更新頂部顯示
+  updateDisplay();
+
+  // 清除滴定資料，準備下一筆
+  ['w1','w2','w3','v1','v2','v3'].forEach(id => document.getElementById(id).value = '');
+}
+
+function calcMA() {
+  const W1 = +document.getElementById('mw1').value;
+  const W2 = +document.getElementById('mw2').value;
+  const W3 = +document.getElementById('mw3').value;
+  const W4 = +document.getElementById('mw4').value;
+
+  if ([W1, W2, W3, W4].some(isNaN) || W2 <= 0) {
+    alert('請填入所有欄位且 W2 需大於 0');
+    return;
+  }
+
+  const water = ((W1 + W2 - W3) / W2) * 100;
+  const ash = ((W4 - W1) / (W2 - water / 100)) * 100;
+
+  document.getElementById('ma-water').textContent = water.toFixed(2);
+  document.getElementById('ma-ash').textContent = ash.toFixed(2);
+  document.getElementById('ma-result').style.display = 'block';
+
+  // 清除輸入框，準備下一筆
+  ['mw1','mw2','mw3','mw4'].forEach(id => document.getElementById(id).value = '');
+}
+</script>
+</body>
+</html>
