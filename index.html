@@ -702,11 +702,11 @@ function calcParticleSize() {
     pct: (netWeights[i] / grandTotal) * 100
   }));
 
-  // 累積保留% (從最大mesh往下加)
+  // 累積保留%：先加自己再存（mesh12=第一個=自己全部=0.62%）
   let cumRetain = 0;
   meshData.forEach(m => {
-    m.cumRetain = cumRetain;
     cumRetain += m.pct;
+    m.cumRetain = cumRetain;
   });
   // 通過% = 100 - 累積保留
   meshData.forEach(m => {
@@ -857,5 +857,6 @@ function calcMA() {
   document.getElementById('ma-result').style.display = 'block';
   ['mw1','mw2','mw3','mw4'].forEach(id => document.getElementById(id).value = '');
 }
+
 
 </script>
