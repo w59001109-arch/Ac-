@@ -532,7 +532,7 @@ if ('serviceWorker' in navigator) {
 <!-- 粒徑頁 -->
 <div id="ps" class="page">
   <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
-    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v9</span>
+    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v10</span>
   </div>
   <div class="ps-carbon-name">
     <label>碳種名稱</label>
@@ -572,7 +572,7 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <div class="card" id="ps-result" style="display:none">
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v9</span> — <span id="ps-out-carbon">—</span></div>
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v10</span> — <span id="ps-out-carbon">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -658,28 +658,21 @@ function toggleEmptyLock() {
   btn.style.color = emptyLocked ? 'var(--green)' : '';
 }
 
-// 空+樣品欄用 type="text" inputmode="decimal"，才能偵測到尾部零（type=number會自動去除）
+// 自動跳格：打完數字暫停 700ms 後跳下一個空+樣品欄
+let _psAdvTimer = null;
 function psAutoAdv(el) {
-  const v = el.value;
-  const dot = v.indexOf('.');
-  if (dot !== -1 && v.length - dot - 1 >= 3) psAdvance(el);
+  clearTimeout(_psAdvTimer);
+  if (el.value.includes('.')) {
+    _psAdvTimer = setTimeout(() => psAdvance(el), 700);
+  }
 }
 function psEnterAdv(e, el) {
   if (e.key === 'Enter') { e.preventDefault(); psAdvance(el); }
 }
 function psAdvance(el) {
-  const id = el.id;
-  if (id.startsWith('ps-empty-')) {
-    // 空重 → 同行空+樣品
-    const row = parseInt(id.replace('ps-empty-', ''));
-    const tw = document.getElementById(`ps-total-w-${row}`);
-    if (tw) { tw.focus(); tw.select(); }
-  } else if (id.startsWith('ps-total-w-')) {
-    // 空+樣品 → 下一行空+樣品（跳過空重）
-    const row = parseInt(id.replace('ps-total-w-', ''));
-    const next = document.getElementById(`ps-total-w-${row + 1}`);
-    if (next) { next.focus(); next.select(); }
-  }
+  const row = parseInt(el.id.replace(/^ps-total-w-/, ''));
+  const next = document.getElementById(`ps-total-w-${row + 1}`);
+  if (next) { next.focus(); next.select(); }
 }
 
 function clearPsData() {
@@ -705,8 +698,8 @@ function renderMeshInput() {
     tr.innerHTML = `
       <td>${m.mesh}</td>
       <td>${m.um}</td>
-      <td><input type="number" id="ps-empty-${i}" placeholder="0.000" step="0.001" value="${m.empty}" ${emptyLocked ? 'readonly' : ''} oninput="calcNet(${i})" onkeydown="psEnterAdv(event,this)"></td>
-      <td><input type="text" inputmode="decimal" id="ps-total-w-${i}" placeholder="0.000" oninput="calcNet(${i});psAutoAdv(this)" onkeydown="psEnterAdv(event,this)"></td>
+      <td><input type="number" id="ps-empty-${i}" placeholder="0.000" step="0.001" value="${m.empty}" tabindex="-1" ${emptyLocked ? 'readonly' : ''} oninput="calcNet(${i})"></td>
+      <td><input type="text" inputmode="decimal" enterkeyhint="next" id="ps-total-w-${i}" placeholder="0.000" oninput="calcNet(${i});psAutoAdv(this)" onkeydown="psEnterAdv(event,this)"></td>
       <td><input type="number" id="ps-net-${i}" readonly placeholder="—"></td>
       <td><span id="ps-pct-${i}" style="color:var(--green);font-weight:700;">—</span></td>
     `;
