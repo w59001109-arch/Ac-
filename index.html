@@ -731,8 +731,11 @@ function calcParticleSize() {
         const prev = reversed[i - 1];
         const curr = reversed[i];
         if (curr.passPct === prev.passPct) return curr.um || 0;
+        // Log interpolation (ASTM standard)
+        const logPrev = Math.log10(prev.um || 1);
+        const logCurr = Math.log10(curr.um || 1);
         const ratio = (targetPct - prev.passPct) / (curr.passPct - prev.passPct);
-        return (prev.um || 0) + ratio * ((curr.um || 0) - (prev.um || 0));
+        return Math.pow(10, logPrev + ratio * (logCurr - logPrev));
       }
     }
     return reversed[reversed.length - 1]?.um || 0;
