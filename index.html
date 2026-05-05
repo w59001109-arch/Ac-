@@ -566,7 +566,10 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 
-  <button class="calc-btn" onclick="calcParticleSize()">計算粒徑分佈</button>
+  <div style="display:flex; gap:8px; margin-bottom:0;">
+    <button class="calc-btn" style="flex:1; margin-bottom:0;" onclick="calcParticleSize()">計算粒徑分佈</button>
+    <button onclick="clearPsData()" style="padding:14px 18px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap;">清除</button>
+  </div>
 
   <div class="card" id="ps-result" style="display:none">
     <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v8</span> — <span id="ps-out-carbon">—</span></div>
@@ -643,6 +646,51 @@ function switchTab(name) {
   if (name === 'ps') renderMeshInput();
 }
 
+let emptyLocked = false;
+function toggleEmptyLock() {
+  emptyLocked = !emptyLocked;
+  DEFAULT_MESH.forEach((_, i) => {
+    const el = document.getElementById(`ps-empty-${i}`);
+    if (el) el.readOnly = emptyLocked;
+  });
+  const btn = document.getElementById('lock-empty-btn');
+  btn.textContent = emptyLocked ? '🔓 解鎖空重' : '🔒 鎖定空重';
+  btn.style.color = emptyLocked ? 'var(--green)' : 'var(--text)';
+}
+
+function psGetInputs() {
+  return [...document.querySelectorAll('#ps-input-body input[type="number"]:not([readonly])')]
+    .filter(el => !el.readOnly);
+}
+function psAutoAdv(el) {
+  const v = el.value;
+  const dot = v.indexOf('.');
+  if (dot !== -1 && v.length - dot - 1 >= 3) psAdvance(el);
+}
+function psEnterAdv(e, el) {
+  if (e.key === 'Enter') { e.preventDefault(); psAdvance(el); }
+}
+function psAdvance(el) {
+  const inputs = psGetInputs();
+  const i = inputs.indexOf(el);
+  if (i !== -1 && i + 1 < inputs.length) { inputs[i + 1].focus(); inputs[i + 1].select(); }
+}
+
+function clearPsData() {
+  DEFAULT_MESH.forEach((_, i) => {
+    const tw = document.getElementById(`ps-total-w-${i}`);
+    if (tw) { tw.value = ''; }
+    const net = document.getElementById(`ps-net-${i}`);
+    if (net) net.value = '';
+    const pct = document.getElementById(`ps-pct-${i}`);
+    if (pct) pct.textContent = '—';
+  });
+  document.getElementById('ps-total').value = '';
+  document.getElementById('ps-result').style.display = 'none';
+  const first = document.getElementById('ps-total-w-0');
+  if (first) { first.focus(); first.select(); }
+}
+
 function renderMeshInput() {
   const tbody = document.getElementById('ps-input-body');
   tbody.innerHTML = '';
@@ -651,8 +699,8 @@ function renderMeshInput() {
     tr.innerHTML = `
       <td>${m.mesh}</td>
       <td>${m.um}</td>
-      <td><input type="number" id="ps-empty-${i}" placeholder="0.000" step="0.001" value="${m.empty}" oninput="calcNet(${i})"></td>
-      <td><input type="number" id="ps-total-w-${i}" placeholder="0.000" step="0.001" oninput="calcNet(${i})"></td>
+      <td><input type="number" id="ps-empty-${i}" placeholder="0.000" step="0.001" value="${m.empty}" oninput="calcNet(${i});psAutoAdv(this)" onkeydown="psEnterAdv(event,this)"></td>
+      <td><input type="number" id="ps-total-w-${i}" placeholder="0.000" step="0.001" oninput="calcNet(${i});psAutoAdv(this)" onkeydown="psEnterAdv(event,this)"></td>
       <td><input type="number" id="ps-net-${i}" readonly placeholder="—"></td>
       <td><span id="ps-pct-${i}" style="color:var(--green);font-weight:700;">—</span></td>
     `;
