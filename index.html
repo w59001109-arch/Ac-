@@ -393,12 +393,28 @@ if ('serviceWorker' in navigator) {
     .detail-grid { gap: 7px; }
   }
 
+
+  .app-version {
+    display: inline-flex; align-items: center; justify-content: center; margin-top: 10px; padding: 4px 12px;
+    border-radius: 999px; background: rgba(105,231,255,.14); border: 1px solid rgba(105,231,255,.30);
+    color: var(--accent); font-size: 12px; font-weight: 900; letter-spacing: 1px; box-shadow: 0 0 18px rgba(105,231,255,.14);
+  }
+  details.compact-constants { padding: 10px 12px; }
+  details.compact-constants summary { cursor: pointer; user-select: none; margin-bottom: 0; }
+  details.compact-constants[open] summary { margin-bottom: 12px; }
+  details.compact-constants summary::-webkit-details-marker { display: none; }
+  details.compact-constants summary::after { content: '點開修改'; color: var(--text-dim); font-size: 10px; font-weight: 700; margin-left: 8px; letter-spacing: .5px; }
+  details.compact-constants[open] summary::after { content: '收合'; }
+  .bs-inline-result { margin-bottom: 10px; }
+  .bs-inline-result .ps-out-card { margin-bottom: 0; }
+
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
+  <div class="app-version">v20</div>
 </div>
 
 <div class="tabs">
@@ -448,8 +464,8 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">常數設定</div>
+  <details class="card compact-constants">
+    <summary class="card-title">常數設定</summary>
     <div class="const-grid">
       <div class="const-item">
         <label>N₂ (I₂當量)</label>
@@ -476,7 +492,7 @@ if ('serviceWorker' in navigator) {
         <div class="val">-1.6990</div>
       </div>
     </div>
-  </div>
+  </details>
 
   <div class="card">
     <div class="card-title">滴定資料</div>
@@ -577,7 +593,7 @@ if ('serviceWorker' in navigator) {
 
   <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
   <div class="card" id="ps-result" style="display:none"><!-- shown by calcParticleSize -->
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v19</span> — <span id="ps-out-carbon">—</span></div>
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span id="ps-out-carbon" style="display:none">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -627,16 +643,8 @@ if ('serviceWorker' in navigator) {
       </table>
     </div>
   </div>
-
-  <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
-    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v19</span>
-  </div>
-  <div class="ps-carbon-name">
-    <label>碳種名稱</label>
-    <input type="text" id="ps-carbon" placeholder="1240" value="1240">
-  </div>
-
-  <div class="card">
+  <input type="hidden" id="ps-carbon" value="1240">
+<div class="card">
     <div class="card-title">篩網重量輸入 (g)</div>
     <div class="ps-table-wrap">
       <table class="ps-input-table">
@@ -673,29 +681,19 @@ if ('serviceWorker' in navigator) {
 <!-- 小蘇打頁 -->
 <div id="bs" class="page">
 
-  <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
-  <div class="card" id="bs-result">
-    <div class="card-title">📊 計算結果</div>
-
-    <!-- 粒徑結果 -->
-    <div style="font-size:12px;color:var(--text-dim);font-weight:600;margin-bottom:6px;">粒徑分析</div>
-    <div class="ps-table-wrap" style="margin-bottom:14px;">
+  <div class="card bs-inline-result" id="bs-result">
+    <div class="card-title">📊 粒徑結果</div>
+    <div class="ps-table-wrap">
       <table class="ps-result-table">
         <thead><tr><th>Mesh</th><th>樣品(g)</th><th>分析值(%)</th></tr></thead>
         <tbody id="bs-result-body"></tbody>
       </table>
     </div>
-
-    <!-- 其他結果 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-      <div class="ps-out-card"><div class="oc-label">水份</div><div class="oc-val" id="bs-r-moisture">—</div><div class="oc-unit">%</div></div>
-      <div class="ps-out-card"><div class="oc-label">CL</div><div class="oc-val" id="bs-r-cl">—</div><div class="oc-unit">ppm</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div class="ps-out-card highlight"><div class="oc-label">純度</div><div class="oc-val" id="bs-r-purity">—</div><div class="oc-unit">%</div></div>
-      <div class="ps-out-card"><div class="oc-label">密度</div><div class="oc-val" id="bs-r-density">—</div><div class="oc-unit">g/ml</div></div>
-    </div>
   </div>
+
+
+  <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
+  
 
 
   <!-- 粒徑分析 -->
@@ -714,6 +712,10 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 
+  <div class="bs-inline-result">
+    <div class="ps-out-card"><div class="oc-label">水份</div><div class="oc-val" id="bs-r-moisture">—</div><div class="oc-unit">%</div></div>
+  </div>
+
   <!-- 水份 -->
   <div class="card">
     <div class="card-title">水份</div>
@@ -725,6 +727,10 @@ if ('serviceWorker' in navigator) {
       <div class="inp-group"><label>總重 (g)</label>
         <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-m-total" placeholder="6.7025" oninput="calcBS()"></div>
     </div>
+  </div>
+
+  <div class="bs-inline-result">
+    <div class="ps-out-card"><div class="oc-label">CL</div><div class="oc-val" id="bs-r-cl">—</div><div class="oc-unit">ppm</div></div>
   </div>
 
   <!-- CL -->
@@ -740,6 +746,10 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 
+  <div class="bs-inline-result">
+    <div class="ps-out-card highlight"><div class="oc-label">純度</div><div class="oc-val" id="bs-r-purity">—</div><div class="oc-unit">%</div></div>
+  </div>
+
   <!-- 純度 -->
   <div class="card">
     <div class="card-title">純度</div>
@@ -751,6 +761,10 @@ if ('serviceWorker' in navigator) {
       <div class="inp-group"><label>滴定終點 (ml)</label>
         <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-pur-end" placeholder="30.5" oninput="calcBS()"></div>
     </div>
+  </div>
+
+  <div class="bs-inline-result">
+    <div class="ps-out-card"><div class="oc-label">密度</div><div class="oc-val" id="bs-r-density">—</div><div class="oc-unit">g/ml</div></div>
   </div>
 
   <!-- 密度 -->
