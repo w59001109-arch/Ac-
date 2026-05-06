@@ -413,11 +413,11 @@ if ('serviceWorker' in navigator) {
       <div class="inp-pair">
         <div class="inp-group">
           <label>樣品重量 W (g)</label>
-          <input type="text" inputmode="decimal" enterkeyhint="next" id="w1" placeholder="1.3168" oninput="ivAutoAdv(this,4)" onkeydown="ivEnterAdv(event,this)">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="w1" placeholder="1.3168" oninput="ivAutoAdv(this,4);calcIodine()" onkeydown="ivEnterAdv(event,this)">
         </div>
         <div class="inp-group">
           <label>滴定體積 V (ml)</label>
-          <input type="text" inputmode="decimal" enterkeyhint="next" id="v1" placeholder="12.97" oninput="ivAutoAdv(this,2)" onkeydown="ivEnterAdv(event,this)">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="v1" placeholder="12.97" oninput="ivAutoAdv(this,2);calcIodine()" onkeydown="ivEnterAdv(event,this)">
         </div>
       </div>
     </div>
@@ -426,11 +426,11 @@ if ('serviceWorker' in navigator) {
       <div class="inp-pair">
         <div class="inp-group">
           <label>樣品重量 W (g)</label>
-          <input type="text" inputmode="decimal" enterkeyhint="next" id="w2" placeholder="1.5295" oninput="ivAutoAdv(this,4)" onkeydown="ivEnterAdv(event,this)">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="w2" placeholder="1.5295" oninput="ivAutoAdv(this,4);calcIodine()" onkeydown="ivEnterAdv(event,this)">
         </div>
         <div class="inp-group">
           <label>滴定體積 V (ml)</label>
-          <input type="text" inputmode="decimal" enterkeyhint="next" id="v2" placeholder="8.86" oninput="ivAutoAdv(this,2)" onkeydown="ivEnterAdv(event,this)">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="v2" placeholder="8.86" oninput="ivAutoAdv(this,2);calcIodine()" onkeydown="ivEnterAdv(event,this)">
         </div>
       </div>
     </div>
@@ -439,19 +439,17 @@ if ('serviceWorker' in navigator) {
       <div class="inp-pair">
         <div class="inp-group">
           <label>樣品重量 W (g)</label>
-          <input type="text" inputmode="decimal" enterkeyhint="next" id="w3" placeholder="1.8636" oninput="ivAutoAdv(this,4)" onkeydown="ivEnterAdv(event,this)">
+          <input type="text" inputmode="decimal" enterkeyhint="next" id="w3" placeholder="1.8636" oninput="ivAutoAdv(this,4);calcIodine()" onkeydown="ivEnterAdv(event,this)">
         </div>
         <div class="inp-group">
           <label>滴定體積 V (ml)</label>
-          <input type="text" inputmode="decimal" enterkeyhint="done" id="v3" placeholder="4.45" oninput="ivAutoAdv(this,2)" onkeydown="ivEnterAdv(event,this)">
+          <input type="text" inputmode="decimal" enterkeyhint="done" id="v3" placeholder="4.45" oninput="ivAutoAdv(this,2);calcIodine()" onkeydown="ivEnterAdv(event,this)">
         </div>
       </div>
     </div>
   </div>
 
-  <button class="calc-btn" onclick="calcIodine()">計算碘值</button>
-
-  <div class="card" id="iodine-result" style="display:none">
+  <div class="card" id="iodine-result">
     <div class="result-box">
       <div class="label">碘值 (Iodine Value)</div>
       <div><span class="value" id="iv-val">—</span><span class="unit">mg/g</span></div>
@@ -495,26 +493,24 @@ if ('serviceWorker' in navigator) {
     <div class="w-grid">
       <div class="w-card">
         <div class="w-label">W1 — 坩堝重量 (g)</div>
-        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="next" id="mw1" placeholder="28.6687" oninput="maAutoAdv(this)" onkeydown="maEnterAdv(event,this)">
+        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="next" id="mw1" placeholder="28.6687" oninput="maAutoAdv(this);calcMA()" onkeydown="maEnterAdv(event,this)">
       </div>
       <div class="w-card">
         <div class="w-label">W2 — 樣品重量 (g)</div>
-        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="next" id="mw2" placeholder="1.386" oninput="maAutoAdv(this)" onkeydown="maEnterAdv(event,this)">
+        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="next" id="mw2" placeholder="1.386" oninput="maAutoAdv(this);calcMA()" onkeydown="maEnterAdv(event,this)">
       </div>
       <div class="w-card">
         <div class="w-label">W3 — 烘乾後總重 (g)</div>
-        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="next" id="mw3" placeholder="29.8568" oninput="maAutoAdv(this)" onkeydown="maEnterAdv(event,this)">
+        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="next" id="mw3" placeholder="29.8568" oninput="maAutoAdv(this);calcMA()" onkeydown="maEnterAdv(event,this)">
       </div>
       <div class="w-card">
         <div class="w-label">W4 — 800°C燒後總重 (g)</div>
-        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="done" id="mw4" placeholder="28.8583" oninput="maAutoAdv(this)" onkeydown="maEnterAdv(event,this)">
+        <input class="w-input" type="text" inputmode="decimal" enterkeyhint="done" id="mw4" placeholder="28.8583" oninput="maAutoAdv(this);calcMA()" onkeydown="maEnterAdv(event,this)">
       </div>
     </div>
   </div>
 
-  <button class="calc-btn" onclick="calcMA()">計算水份 & 灰份</button>
-
-  <div class="card" id="ma-result" style="display:none">
+  <div class="card" id="ma-result">
     <div class="res2-grid">
       <div class="res2-card">
         <div class="r-label">水份 ( Moisture )</div>
@@ -533,7 +529,7 @@ if ('serviceWorker' in navigator) {
 <!-- 粒徑頁 -->
 <div id="ps" class="page">
   <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
-    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v17</span>
+    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v18</span>
   </div>
   <div class="ps-carbon-name">
     <label>碳種名稱</label>
@@ -568,12 +564,11 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <div style="display:flex; gap:8px; margin-bottom:0;">
-    <button class="calc-btn" style="flex:1; margin-bottom:0;" onclick="calcParticleSize()">計算粒徑分佈</button>
-    <button onclick="clearPsData()" style="padding:14px 18px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap;">清除</button>
+    <button onclick="clearPsData()" style="flex:1; padding:14px 18px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap;">清除</button>
   </div>
 
-  <div class="card" id="ps-result" style="display:none">
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v17</span> — <span id="ps-out-carbon">—</span></div>
+  <div class="card" id="ps-result" style="display:none"><!-- shown by calcParticleSize -->
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v18</span> — <span id="ps-out-carbon">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -649,11 +644,11 @@ if ('serviceWorker' in navigator) {
     <div class="card-title">水份</div>
     <div class="inp-pair">
       <div class="inp-group"><label>空重 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-m-empty" placeholder="1.3129" oninput="bsSeqAdv(this,4,'bs-m-sample')"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-m-empty" placeholder="1.3129" oninput="bsSeqAdv(this,4,'bs-m-sample');calcBS()"></div>
       <div class="inp-group"><label>樣品重 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-m-sample" placeholder="5.3996" oninput="bsSeqAdv(this,4,'bs-m-total')"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-m-sample" placeholder="5.3996" oninput="bsSeqAdv(this,4,'bs-m-total');calcBS()"></div>
       <div class="inp-group"><label>總重 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-m-total" placeholder="6.7025"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-m-total" placeholder="6.7025" oninput="calcBS()"></div>
     </div>
   </div>
 
@@ -662,11 +657,11 @@ if ('serviceWorker' in navigator) {
     <div class="card-title">氯離子 CL</div>
     <div class="inp-pair">
       <div class="inp-group"><label>樣品重 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-sample" placeholder="1.0389" oninput="bsSeqAdv(this,4,'bs-cl-test')"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-sample" placeholder="1.0389" oninput="bsSeqAdv(this,4,'bs-cl-test');calcBS()"></div>
       <div class="inp-group"><label>測試值</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-test" placeholder="0.782" oninput="bsSeqAdv(this,2,'bs-cl-dil')"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-test" placeholder="0.782" oninput="bsSeqAdv(this,2,'bs-cl-dil');calcBS()"></div>
       <div class="inp-group"><label>稀釋倍數</label>
-        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-cl-dil" placeholder="1" value="1"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-cl-dil" placeholder="1" value="1" oninput="calcBS()"></div>
     </div>
   </div>
 
@@ -675,11 +670,11 @@ if ('serviceWorker' in navigator) {
     <div class="card-title">純度</div>
     <div class="inp-pair">
       <div class="inp-group"><label>樣品重 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-pur-sample" placeholder="2.5416" oninput="bsSeqAdv(this,4,'bs-pur-start')"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-pur-sample" placeholder="2.5416" oninput="bsSeqAdv(this,4,'bs-pur-start');calcBS()"></div>
       <div class="inp-group"><label>滴定起始 (ml)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-pur-start" placeholder="0.2" oninput="bsSeqAdv(this,1,'bs-pur-end')"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-pur-start" placeholder="0.2" oninput="bsSeqAdv(this,1,'bs-pur-end');calcBS()"></div>
       <div class="inp-group"><label>滴定終點 (ml)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-pur-end" placeholder="30.5"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-pur-end" placeholder="30.5" oninput="calcBS()"></div>
     </div>
   </div>
 
@@ -688,15 +683,13 @@ if ('serviceWorker' in navigator) {
     <div class="card-title">密度 (10 ml 量筒)</div>
     <div class="inp-pair">
       <div class="inp-group"><label>鬆重量 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-den-loose" placeholder="9.9376" oninput="bsSeqAdv(this,4,'bs-den-tight')"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-den-loose" placeholder="9.9376" oninput="bsSeqAdv(this,4,'bs-den-tight');calcBS()"></div>
       <div class="inp-group"><label>緊重量 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-den-tight" placeholder="13.6207"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-den-tight" placeholder="13.6207" oninput="calcBS()"></div>
     </div>
   </div>
 
-  <button class="calc-btn" onclick="calcBS()">計算小蘇打</button>
-
-  <div class="card" id="bs-result" style="display:none">
+  <div class="card" id="bs-result">
     <div class="card-title">📊 計算結果</div>
 
     <!-- 粒徑結果 -->
@@ -826,6 +819,7 @@ function calcNet(idx) {
   } else {
     document.getElementById(`ps-pct-${idx}`).textContent = '—';
   }
+  calcParticleSize();
 }
 
 function calcParticleSize() {
@@ -838,10 +832,7 @@ function calcParticleSize() {
   });
 
   const grandTotal = netWeights.reduce((a, b) => a + b, 0);
-  if (grandTotal <= 0) {
-    alert('請先填入篩網重量資料');
-    return;
-  }
+  if (grandTotal <= 0) return;
 
   // 各 mesh 百分比
   const meshData = DEFAULT_MESH.map((m, i) => ({
@@ -950,8 +941,9 @@ document.addEventListener('DOMContentLoaded', () => {
   updateDisplay();
   renderMeshInput();
 });
-document.getElementById('n2_i2').addEventListener('input', updateDisplay);
-document.getElementById('n2_na').addEventListener('input', updateDisplay);
+document.getElementById('n2_i2').addEventListener('input', () => { updateDisplay(); calcIodine(); });
+document.getElementById('n2_na').addEventListener('input', () => { updateDisplay(); calcIodine(); });
+document.getElementById('df').addEventListener('input', calcIodine);
 
 const IV_SEQ = ['w1','v1','w2','v2','w3','v3'];
 let _ivAdvTimer = null;
@@ -972,22 +964,21 @@ function ivAdvance(el) {
 }
 
 function calcIodine() {
+  function clearIV() {
+    ['iv-val','iv-b','iv-a','iv-factor','iv-b2','iv-r2'].forEach(id => document.getElementById(id).textContent = '—');
+  }
   const n2_i2 = +document.getElementById('n2_i2').value;
   const n2_na = +document.getElementById('n2_na').value;
   const df = +document.getElementById('df').value;
-  if (!n2_i2 || !n2_na || !df || n2_i2 <= 0 || n2_na <= 0 || df <= 0) {
-    alert('請填入所有常數（需大於 0）'); return;
-  }
+  if (!n2_i2 || !n2_na || !df || n2_i2 <= 0 || n2_na <= 0 || df <= 0) { clearIV(); return; }
   const W = [+document.getElementById('w1').value, +document.getElementById('w2').value, +document.getElementById('w3').value];
   const V = [+document.getElementById('v1').value, +document.getElementById('v2').value, +document.getElementById('v3').value];
-  if (W.some(isNaN) || V.some(isNaN) || W.some(w => w <= 0) || V.some(v => v <= 0)) {
-    alert('請填入所有滴定資料且需大於 0'); return;
-  }
+  if (W.some(isNaN) || V.some(isNaN) || W.some(w => w <= 0) || V.some(v => v <= 0)) { clearIV(); return; }
   const factor = n2_i2 * 12693;
   const b_val = n2_na * 126.93;
   const C_arr = V.map(v => n2_na * v / 50);
   const XM_arr = V.map((v, i) => (factor - df * b_val * v) / W[i]);
-  if (XM_arr.some(x => x <= 0)) { alert('X/M 有負值，請檢查輸入'); return; }
+  if (XM_arr.some(x => x <= 0)) { clearIV(); return; }
   const logC = C_arr.map(c => Math.log10(c));
   const logXM = XM_arr.map(x => Math.log10(x));
   const n = 3;
@@ -995,7 +986,7 @@ function calcIodine() {
   const meanY = logXM.reduce((s, v) => s + v, 0) / n;
   const num = logC.reduce((s, lx, i) => s + (lx - meanX) * (logXM[i] - meanY), 0);
   const den = logC.reduce((s, lx) => s + (lx - meanX) ** 2, 0);
-  if (den === 0) { alert('資料無法做迴歸'); return; }
+  if (den === 0) { clearIV(); return; }
   const b_slope = num / den;
   const a_int = meanY - b_slope * meanX;
   const ssRes = logXM.reduce((s, ly, i) => s + (ly - (a_int + b_slope * logC[i])) ** 2, 0);
@@ -1008,9 +999,7 @@ function calcIodine() {
   document.getElementById('iv-factor').textContent = factor.toFixed(2);
   document.getElementById('iv-b2').textContent = b_val.toFixed(3);
   document.getElementById('iv-r2').textContent = r2.toFixed(4);
-  document.getElementById('iodine-result').style.display = 'block';
   updateDisplay();
-  ['w1','w2','w3','v1','v2','v3'].forEach(id => document.getElementById(id).value = '');
 }
 
 // ── 小蘇打 ──
@@ -1045,6 +1034,7 @@ function bsCalcNet(idx) {
   const total = +document.getElementById(`bs-total-${idx}`).value || 0;
   const net = Math.max(0, total - empty);
   document.getElementById(`bs-net-${idx}`).textContent = net > 0 ? net.toFixed(4) : '—';
+  calcBS();
 }
 
 let _bsAdvTimer = null;
@@ -1124,8 +1114,6 @@ function calcBS() {
   document.getElementById('bs-r-cl').textContent       = clPpm    !== null ? clPpm.toFixed(2)          : '—';
   document.getElementById('bs-r-purity').textContent   = purity   !== null ? purity.toFixed(4) + '%'   : '—';
   document.getElementById('bs-r-density').textContent  = density  !== null ? density.toFixed(4)         : '—';
-
-  document.getElementById('bs-result').style.display = 'block';
 }
 
 const MA_SEQ = ['mw1', 'mw2', 'mw3', 'mw4'];
@@ -1151,13 +1139,15 @@ function calcMA() {
   const W2 = +document.getElementById('mw2').value;
   const W3 = +document.getElementById('mw3').value;
   const W4 = +document.getElementById('mw4').value;
-  if ([W1, W2, W3, W4].some(isNaN) || W2 <= 0) { alert('請填入所有欄位'); return; }
+  if (![W1, W2, W3, W4].every(v => v > 0)) {
+    document.getElementById('ma-water').textContent = '—';
+    document.getElementById('ma-ash').textContent = '—';
+    return;
+  }
   const water = ((W1 + W2 - W3) / W2) * 100;
   const ash = ((W4 - W1) / (W2 - water / 100)) * 100;
   document.getElementById('ma-water').textContent = water.toFixed(2);
   document.getElementById('ma-ash').textContent = ash.toFixed(2);
-  document.getElementById('ma-result').style.display = 'block';
-  ['mw1','mw2','mw3','mw4'].forEach(id => document.getElementById(id).value = '');
 }
 
 
