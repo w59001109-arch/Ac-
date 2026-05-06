@@ -188,7 +188,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v24</div>
+  <div class="app-version">v25</div>
 </div>
 
 <div class="tabs">
@@ -899,7 +899,7 @@ function calcBS() {
   BS_MESH.forEach((m, i) => {
     const pct = totalW > 0 ? nets[i] / totalW * 100 : 0;
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${m.mesh}</td><td>${nets[i].toFixed(4)}</td><td class="green">${pct.toFixed(4)}%</td>`;
+    tr.innerHTML = `<td>${m.mesh}</td><td>${nets[i].toFixed(4)}</td><td class="green">${pct.toFixed(2)}%</td>`;
     tbody.appendChild(tr);
   });
   const totRow = document.createElement('tr');
@@ -931,10 +931,10 @@ function calcBS() {
   const tight = +document.getElementById('bs-den-tight').value || 0;
   const density = (loose + tight) > 0 ? (loose + tight) / 2 / 10 : null;
 
-  document.getElementById('bs-r-moisture').textContent = moisture !== null ? moisture.toFixed(4) + '%' : '—';
+  document.getElementById('bs-r-moisture').textContent = moisture !== null ? moisture.toFixed(2) + '%' : '—';
   document.getElementById('bs-r-cl').textContent       = clPpm    !== null ? clPpm.toFixed(2)          : '—';
-  document.getElementById('bs-r-purity').textContent   = purity   !== null ? purity.toFixed(4) + '%'   : '—';
-  document.getElementById('bs-r-density').textContent  = density  !== null ? density.toFixed(4)         : '—';
+  document.getElementById('bs-r-purity').textContent   = purity   !== null ? purity.toFixed(1) + '%'   : '—';
+  document.getElementById('bs-r-density').textContent  = density  !== null ? density.toFixed(2)         : '—';
 }
 
 const MA_SEQ = ['mw1', 'mw2', 'mw3', 'mw4'];
