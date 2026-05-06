@@ -370,7 +370,7 @@ if ('serviceWorker' in navigator) {
 <div class="tabs">
   <div class="tab active" onclick="switchTab('iodine')">碘值</div>
   <div class="tab" onclick="switchTab('ma')">水份灰份</div>
-  <div class="tab" onclick="switchTab('ps')">粒徑</div>
+  <div class="tab" onclick="switchTab('bs')">小蘇打</div>
 </div>
 
 <!-- 碘值頁 -->
@@ -532,7 +532,7 @@ if ('serviceWorker' in navigator) {
 <!-- 粒徑頁 -->
 <div id="ps" class="page">
   <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
-    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v13</span>
+    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v14</span>
   </div>
   <div class="ps-carbon-name">
     <label>碳種名稱</label>
@@ -572,7 +572,7 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <div class="card" id="ps-result" style="display:none">
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v13</span> — <span id="ps-out-carbon">—</span></div>
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v14</span> — <span id="ps-out-carbon">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -624,6 +624,110 @@ if ('serviceWorker' in navigator) {
   </div>
 </div>
 
+<!-- 小蘇打頁 -->
+<div id="bs" class="page">
+
+  <!-- 粒徑分析 -->
+  <div class="card">
+    <div class="card-title">粒徑分析</div>
+    <div class="ps-table-wrap">
+      <table class="ps-input-table">
+        <thead>
+          <tr><th>Mesh</th><th>空重</th><th>空+樣品</th><th>樣品(g)</th></tr>
+        </thead>
+        <tbody id="bs-input-body"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--text-dim);">
+      總重：<span id="bs-total-w" style="color:var(--text);font-weight:700;">—</span> g
+    </div>
+  </div>
+
+  <!-- 水份 -->
+  <div class="card">
+    <div class="card-title">水份</div>
+    <div class="inp-pair">
+      <div class="inp-group"><label>空重 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-m-empty" placeholder="1.3129" oninput="bsSeqAdv(this,4,'bs-m-sample')"></div>
+      <div class="inp-group"><label>樣品重 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-m-sample" placeholder="5.3996" oninput="bsSeqAdv(this,4,'bs-m-total')"></div>
+      <div class="inp-group"><label>總重 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-m-total" placeholder="6.7025"></div>
+    </div>
+  </div>
+
+  <!-- CL & pH -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">氯離子 CL</div>
+      <div class="inp-group" style="margin-bottom:8px;"><label>樣品重 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-sample" placeholder="1.0389" oninput="bsSeqAdv(this,4,'bs-cl-test')"></div>
+      <div class="inp-group" style="margin-bottom:8px;"><label>測試值</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-test" placeholder="0.782" oninput="bsSeqAdv(this,2,'bs-cl-dil')"></div>
+      <div class="inp-group"><label>稀釋倍數</label>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-cl-dil" placeholder="1" value="1"></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div class="card-title">pH</div>
+      <div class="inp-group" style="margin-bottom:8px;"><label>樣品重 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-ph-sample" placeholder="5.0953" oninput="bsSeqAdv(this,4,'bs-ph-val')"></div>
+      <div class="inp-group"><label>pH 值</label>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-ph-val" placeholder="8.1"></div>
+    </div>
+  </div>
+
+  <!-- 純度 -->
+  <div class="card">
+    <div class="card-title">純度</div>
+    <div class="inp-pair">
+      <div class="inp-group"><label>樣品重 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-pur-sample" placeholder="2.5416" oninput="bsSeqAdv(this,4,'bs-pur-start')"></div>
+      <div class="inp-group"><label>滴定起始 (ml)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-pur-start" placeholder="0.2" oninput="bsSeqAdv(this,1,'bs-pur-end')"></div>
+      <div class="inp-group"><label>滴定終點 (ml)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-pur-end" placeholder="30.5"></div>
+    </div>
+  </div>
+
+  <!-- 密度 -->
+  <div class="card">
+    <div class="card-title">密度 (10 ml 量筒)</div>
+    <div class="inp-pair">
+      <div class="inp-group"><label>鬆重量 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-den-loose" placeholder="9.9376" oninput="bsSeqAdv(this,4,'bs-den-tight')"></div>
+      <div class="inp-group"><label>緊重量 (g)</label>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-den-tight" placeholder="13.6207"></div>
+    </div>
+  </div>
+
+  <button class="calc-btn" onclick="calcBS()">計算小蘇打</button>
+
+  <div class="card" id="bs-result" style="display:none">
+    <div class="card-title">📊 計算結果</div>
+
+    <!-- 粒徑結果 -->
+    <div style="font-size:12px;color:var(--text-dim);font-weight:600;margin-bottom:6px;">粒徑分析</div>
+    <div class="ps-table-wrap" style="margin-bottom:14px;">
+      <table class="ps-result-table">
+        <thead><tr><th>Mesh</th><th>樣品(g)</th><th>分析值(%)</th></tr></thead>
+        <tbody id="bs-result-body"></tbody>
+      </table>
+    </div>
+
+    <!-- 其他結果 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div class="ps-out-card"><div class="oc-label">水份</div><div class="oc-val" id="bs-r-moisture">—</div><div class="oc-unit">%</div></div>
+      <div class="ps-out-card"><div class="oc-label">CL</div><div class="oc-val" id="bs-r-cl">—</div><div class="oc-unit">ppm</div></div>
+      <div class="ps-out-card"><div class="oc-label">pH</div><div class="oc-val" id="bs-r-ph">—</div><div class="oc-unit"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="ps-out-card highlight"><div class="oc-label">純度</div><div class="oc-val" id="bs-r-purity">—</div><div class="oc-unit">%</div></div>
+      <div class="ps-out-card"><div class="oc-label">密度</div><div class="oc-val" id="bs-r-density">—</div><div class="oc-unit">g/ml</div></div>
+    </div>
+  </div>
+
+</div>
+
 <script>
 const LOG_C_TARGET = Math.log10(0.02);
 
@@ -644,6 +748,7 @@ function switchTab(name) {
   document.getElementById(name).classList.add('active');
   event.target.classList.add('active');
   if (name === 'ps') renderMeshInput();
+  if (name === 'bs') renderBSInput();
 }
 
 let emptyLocked = false;
@@ -913,6 +1018,125 @@ function calcIodine() {
   document.getElementById('iodine-result').style.display = 'block';
   updateDisplay();
   ['w1','w2','w3','v1','v2','v3'].forEach(id => document.getElementById(id).value = '');
+}
+
+// ── 小蘇打 ──
+const BS_MESH = [
+  { mesh: '35',  empty: 307.3 },
+  { mesh: '80',  empty: 309.9 },
+  { mesh: '100', empty: 295.8 },
+  { mesh: '120', empty: 281.0 },
+  { mesh: '140', empty: 283.9 },
+  { mesh: '200', empty: 274.7 },
+  { mesh: '230', empty: 279.1 },
+  { mesh: '底',  empty: 356.3 },
+];
+
+function renderBSInput() {
+  const tbody = document.getElementById('bs-input-body');
+  tbody.innerHTML = '';
+  BS_MESH.forEach((m, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${m.mesh}</td>
+      <td><input type="number" id="bs-empty-${i}" step="0.1" value="${m.empty}" tabindex="-1" oninput="bsCalcNet(${i})"></td>
+      <td><input type="text" inputmode="decimal" enterkeyhint="next" id="bs-total-${i}" placeholder="0.0" oninput="bsCalcNet(${i});bsSieveAdv(this)" onkeydown="bsSieveEnter(event,this)"></td>
+      <td id="bs-net-${i}" style="color:var(--text);font-weight:600;">—</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function bsCalcNet(idx) {
+  const empty = +document.getElementById(`bs-empty-${idx}`).value || 0;
+  const total = +document.getElementById(`bs-total-${idx}`).value || 0;
+  const net = Math.max(0, total - empty);
+  document.getElementById(`bs-net-${idx}`).textContent = net > 0 ? net.toFixed(4) : '—';
+}
+
+let _bsAdvTimer = null;
+function bsSieveAdv(el) {
+  clearTimeout(_bsAdvTimer);
+  if (el.value.includes('.')) _bsAdvTimer = setTimeout(() => {
+    const row = parseInt(el.id.replace('bs-total-', ''));
+    const next = document.getElementById(`bs-total-${row + 1}`);
+    if (next) { next.focus(); next.select(); }
+  }, 700);
+}
+function bsSieveEnter(e, el) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const row = parseInt(el.id.replace('bs-total-', ''));
+  const next = document.getElementById(`bs-total-${row + 1}`);
+  if (next) { next.focus(); next.select(); }
+}
+
+// 通用：打滿 decimals 位小數跳到 nextId
+function bsSeqAdv(el, decimals, nextId) {
+  const v = el.value, dot = v.indexOf('.');
+  if (dot !== -1 && v.length - dot - 1 >= decimals) {
+    const next = document.getElementById(nextId);
+    if (next) { next.focus(); next.select(); }
+  }
+}
+
+function calcBS() {
+  // 粒徑
+  const nets = BS_MESH.map((_, i) => {
+    const empty = +document.getElementById(`bs-empty-${i}`).value || 0;
+    const total = +document.getElementById(`bs-total-${i}`).value || 0;
+    return Math.max(0, total - empty);
+  });
+  const totalW = nets.reduce((a, b) => a + b, 0);
+  document.getElementById('bs-total-w').textContent = totalW.toFixed(4);
+
+  const tbody = document.getElementById('bs-result-body');
+  tbody.innerHTML = '';
+  BS_MESH.forEach((m, i) => {
+    const pct = totalW > 0 ? nets[i] / totalW * 100 : 0;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${m.mesh}</td><td>${nets[i].toFixed(4)}</td><td class="green">${pct.toFixed(4)}%</td>`;
+    tbody.appendChild(tr);
+  });
+  const totRow = document.createElement('tr');
+  totRow.className = 'total-row';
+  totRow.innerHTML = `<td>總計</td><td>${totalW.toFixed(4)}</td><td>100%</td>`;
+  tbody.appendChild(totRow);
+
+  // 水份
+  const mEmpty  = +document.getElementById('bs-m-empty').value  || 0;
+  const mSample = +document.getElementById('bs-m-sample').value || 0;
+  const mTotal  = +document.getElementById('bs-m-total').value  || 0;
+  const moisture = mSample > 0 ? ((mSample - (mTotal - mEmpty)) / mSample) * 100 : null;
+
+  // CL
+  const clSample = +document.getElementById('bs-cl-sample').value || 0;
+  const clTest   = +document.getElementById('bs-cl-test').value   || 0;
+  const clDil    = +document.getElementById('bs-cl-dil').value    || 1;
+  const clPpm = clSample > 0 ? clTest * 100 * 2 / clSample * clDil : null;
+
+  // pH
+  const phVal = document.getElementById('bs-ph-val').value;
+
+  // 純度
+  const purSample = +document.getElementById('bs-pur-sample').value || 0;
+  const purStart  = +document.getElementById('bs-pur-start').value  || 0;
+  const purEnd    = +document.getElementById('bs-pur-end').value    || 0;
+  const purTit = purEnd - purStart - 0.1;
+  const purity = purSample > 0 ? (purTit * 84.01 / (purSample * 1000)) * 100 : null;
+
+  // 密度
+  const loose = +document.getElementById('bs-den-loose').value || 0;
+  const tight = +document.getElementById('bs-den-tight').value || 0;
+  const density = (loose + tight) > 0 ? (loose + tight) / 2 / 10 : null;
+
+  document.getElementById('bs-r-moisture').textContent = moisture !== null ? moisture.toFixed(4) + '%' : '—';
+  document.getElementById('bs-r-cl').textContent       = clPpm    !== null ? clPpm.toFixed(2)          : '—';
+  document.getElementById('bs-r-ph').textContent       = phVal || '—';
+  document.getElementById('bs-r-purity').textContent   = purity   !== null ? purity.toFixed(4) + '%'   : '—';
+  document.getElementById('bs-r-density').textContent  = density  !== null ? density.toFixed(4)         : '—';
+
+  document.getElementById('bs-result').style.display = 'block';
 }
 
 const MA_SEQ = ['mw1', 'mw2', 'mw3', 'mw4'];
