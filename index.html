@@ -689,7 +689,7 @@ if ('serviceWorker' in navigator) {
       <div class="inp-group"><label>鬆重量 (g)</label>
         <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-den-loose" placeholder="9.9376" oninput="bsSeqAdv(this,4,'bs-den-tight');calcBS()"></div>
       <div class="inp-group"><label>緊重量 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-den-tight" placeholder="13.6207" oninput="calcBS()"></div>
+        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-den-tight" placeholder="13.6207" oninput="calcBS();bsDenTightAdv(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();clearTimeout(_bsClearTimer);clearBS()}"></div>
     </div>
   </div>
 
@@ -952,14 +952,24 @@ document.getElementById('n2_na').addEventListener('input', () => { updateDisplay
 document.getElementById('df').addEventListener('input', calcIodine);
 
 const IV_SEQ = ['w1','v1','w2','v2','w3','v3'];
-let _ivAdvTimer = null;
+let _ivClearTimer = null;
 function ivAutoAdv(el, decimals) {
   const v = el.value;
   const dot = v.indexOf('.');
-  if (dot !== -1 && v.length - dot - 1 >= decimals) ivAdvance(el);
+  if (dot !== -1 && v.length - dot - 1 >= decimals) {
+    if (el.id === 'v3') {
+      clearTimeout(_ivClearTimer);
+      _ivClearTimer = setTimeout(clearIodine, 1500);
+    } else {
+      ivAdvance(el);
+    }
+  }
 }
 function ivEnterAdv(e, el) {
-  if (e.key === 'Enter') { e.preventDefault(); ivAdvance(el); }
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  if (el.id === 'v3') { clearTimeout(_ivClearTimer); clearIodine(); }
+  else ivAdvance(el);
 }
 function ivAdvance(el) {
   const i = IV_SEQ.indexOf(el.id);
@@ -1060,6 +1070,15 @@ function bsSieveEnter(e, el) {
   if (next) { next.focus(); next.select(); }
 }
 
+let _bsClearTimer = null;
+function bsDenTightAdv(el) {
+  const v = el.value, dot = v.indexOf('.');
+  if (dot !== -1 && v.length - dot - 1 >= 4) {
+    clearTimeout(_bsClearTimer);
+    _bsClearTimer = setTimeout(clearBS, 1500);
+  }
+}
+
 // 通用：打滿 decimals 位小數跳到 nextId
 function bsSeqAdv(el, decimals, nextId) {
   const v = el.value, dot = v.indexOf('.');
@@ -1123,14 +1142,24 @@ function calcBS() {
 }
 
 const MA_SEQ = ['mw1', 'mw2', 'mw3', 'mw4'];
-let _maAdvTimer = null;
+let _maClearTimer = null;
 function maAutoAdv(el) {
   const v = el.value;
   const dot = v.indexOf('.');
-  if (dot !== -1 && v.length - dot - 1 >= 4) maAdvance(el);
+  if (dot !== -1 && v.length - dot - 1 >= 4) {
+    if (el.id === 'mw4') {
+      clearTimeout(_maClearTimer);
+      _maClearTimer = setTimeout(clearMA, 1500);
+    } else {
+      maAdvance(el);
+    }
+  }
 }
 function maEnterAdv(e, el) {
-  if (e.key === 'Enter') { e.preventDefault(); maAdvance(el); }
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  if (el.id === 'mw4') { clearTimeout(_maClearTimer); clearMA(); }
+  else maAdvance(el);
 }
 function maAdvance(el) {
   const i = MA_SEQ.indexOf(el.id);
