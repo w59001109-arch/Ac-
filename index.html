@@ -533,7 +533,7 @@ if ('serviceWorker' in navigator) {
 <!-- 粒徑頁 -->
 <div id="ps" class="page">
   <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
-    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v15</span>
+    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v16</span>
   </div>
   <div class="ps-carbon-name">
     <label>碳種名稱</label>
@@ -573,7 +573,7 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <div class="card" id="ps-result" style="display:none">
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v15</span> — <span id="ps-out-carbon">—</span></div>
+    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v16</span> — <span id="ps-out-carbon">—</span></div>
 
     <!-- 12x40 醒目區塊 -->
     <div class="ps-fraction-row">
@@ -657,23 +657,16 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 
-  <!-- CL & pH -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title">氯離子 CL</div>
-      <div class="inp-group" style="margin-bottom:8px;"><label>樣品重 (g)</label>
+  <!-- CL -->
+  <div class="card">
+    <div class="card-title">氯離子 CL</div>
+    <div class="inp-pair">
+      <div class="inp-group"><label>樣品重 (g)</label>
         <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-sample" placeholder="1.0389" oninput="bsSeqAdv(this,4,'bs-cl-test')"></div>
-      <div class="inp-group" style="margin-bottom:8px;"><label>測試值</label>
+      <div class="inp-group"><label>測試值</label>
         <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-cl-test" placeholder="0.782" oninput="bsSeqAdv(this,2,'bs-cl-dil')"></div>
       <div class="inp-group"><label>稀釋倍數</label>
         <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-cl-dil" placeholder="1" value="1"></div>
-    </div>
-    <div class="card" style="margin-bottom:0">
-      <div class="card-title">pH</div>
-      <div class="inp-group" style="margin-bottom:8px;"><label>樣品重 (g)</label>
-        <input type="text" inputmode="decimal" enterkeyhint="next" id="bs-ph-sample" placeholder="5.0953" oninput="bsSeqAdv(this,4,'bs-ph-val')"></div>
-      <div class="inp-group"><label>pH 值</label>
-        <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-ph-val" placeholder="8.1"></div>
     </div>
   </div>
 
@@ -716,10 +709,9 @@ if ('serviceWorker' in navigator) {
     </div>
 
     <!-- 其他結果 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
       <div class="ps-out-card"><div class="oc-label">水份</div><div class="oc-val" id="bs-r-moisture">—</div><div class="oc-unit">%</div></div>
       <div class="ps-out-card"><div class="oc-label">CL</div><div class="oc-val" id="bs-r-cl">—</div><div class="oc-unit">ppm</div></div>
-      <div class="ps-out-card"><div class="oc-label">pH</div><div class="oc-val" id="bs-r-ph">—</div><div class="oc-unit"></div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
       <div class="ps-out-card highlight"><div class="oc-label">純度</div><div class="oc-val" id="bs-r-purity">—</div><div class="oc-unit">%</div></div>
@@ -1116,9 +1108,6 @@ function calcBS() {
   const clDil    = +document.getElementById('bs-cl-dil').value    || 1;
   const clPpm = clSample > 0 ? clTest * 100 * 2 / clSample * clDil : null;
 
-  // pH
-  const phVal = document.getElementById('bs-ph-val').value;
-
   // 純度
   const purSample = +document.getElementById('bs-pur-sample').value || 0;
   const purStart  = +document.getElementById('bs-pur-start').value  || 0;
@@ -1133,7 +1122,6 @@ function calcBS() {
 
   document.getElementById('bs-r-moisture').textContent = moisture !== null ? moisture.toFixed(4) + '%' : '—';
   document.getElementById('bs-r-cl').textContent       = clPpm    !== null ? clPpm.toFixed(2)          : '—';
-  document.getElementById('bs-r-ph').textContent       = phVal || '—';
   document.getElementById('bs-r-purity').textContent   = purity   !== null ? purity.toFixed(4) + '%'   : '—';
   document.getElementById('bs-r-density').textContent  = density  !== null ? density.toFixed(4)         : '—';
 
