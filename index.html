@@ -410,6 +410,44 @@ if ('serviceWorker' in navigator) {
 
 <!-- 碘值頁 -->
 <div id="iodine" class="page active">
+
+  <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
+  <div class="card" id="iodine-result">
+    <div class="result-box">
+      <div class="label">碘值 (Iodine Value)</div>
+      <div><span class="value" id="iv-val">—</span><span class="unit">mg/g</span></div>
+      <div class="sub">log(C) vs log(X/M) 線性迴歸</div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="d-label">斜率 b</div>
+        <div class="d-val" id="iv-b">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">截距 a</div>
+        <div class="d-val" id="iv-a">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">log(0.02)</div>
+        <div class="d-val">-1.6990</div>
+      </div>
+    </div>
+    <div class="detail-grid" style="margin-top:8px">
+      <div class="detail-item">
+        <div class="d-label">Factor (A)</div>
+        <div class="d-val" id="iv-factor">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">B</div>
+        <div class="d-val" id="iv-b2">—</div>
+      </div>
+      <div class="detail-item">
+        <div class="d-label">R²</div>
+        <div class="d-val" id="iv-r2">—</div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">常數設定</div>
     <div class="const-grid">
@@ -485,45 +523,28 @@ if ('serviceWorker' in navigator) {
 
   <button onclick="clearIodine()" style="width:100%; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; margin-bottom:0;">清除</button>
 
-  <div class="card" id="iodine-result">
-    <div class="result-box">
-      <div class="label">碘值 (Iodine Value)</div>
-      <div><span class="value" id="iv-val">—</span><span class="unit">mg/g</span></div>
-      <div class="sub">log(C) vs log(X/M) 線性迴歸</div>
-    </div>
-    <div class="detail-grid">
-      <div class="detail-item">
-        <div class="d-label">斜率 b</div>
-        <div class="d-val" id="iv-b">—</div>
-      </div>
-      <div class="detail-item">
-        <div class="d-label">截距 a</div>
-        <div class="d-val" id="iv-a">—</div>
-      </div>
-      <div class="detail-item">
-        <div class="d-label">log(0.02)</div>
-        <div class="d-val">-1.6990</div>
-      </div>
-    </div>
-    <div class="detail-grid" style="margin-top:8px">
-      <div class="detail-item">
-        <div class="d-label">Factor (A)</div>
-        <div class="d-val" id="iv-factor">—</div>
-      </div>
-      <div class="detail-item">
-        <div class="d-label">B</div>
-        <div class="d-val" id="iv-b2">—</div>
-      </div>
-      <div class="detail-item">
-        <div class="d-label">R²</div>
-        <div class="d-val" id="iv-r2">—</div>
-      </div>
-    </div>
-  </div>
+  
 </div>
 
 <!-- 水份灰份頁 -->
 <div id="ma" class="page">
+
+  <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
+  <div class="card" id="ma-result">
+    <div class="res2-grid">
+      <div class="res2-card">
+        <div class="r-label">水份 ( Moisture )</div>
+        <div class="r-val" id="ma-water">—</div>
+        <div class="r-unit">%</div>
+      </div>
+      <div class="res2-card">
+        <div class="r-label">灰份 ( Ash )</div>
+        <div class="r-val" id="ma-ash">—</div>
+        <div class="r-unit">%</div>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">重量輸入</div>
     <div class="w-grid">
@@ -548,63 +569,13 @@ if ('serviceWorker' in navigator) {
 
   <button onclick="clearMA()" style="width:100%; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; margin-bottom:0;">清除</button>
 
-  <div class="card" id="ma-result">
-    <div class="res2-grid">
-      <div class="res2-card">
-        <div class="r-label">水份 ( Moisture )</div>
-        <div class="r-val" id="ma-water">—</div>
-        <div class="r-unit">%</div>
-      </div>
-      <div class="res2-card">
-        <div class="r-label">灰份 ( Ash )</div>
-        <div class="r-val" id="ma-ash">—</div>
-        <div class="r-unit">%</div>
-      </div>
-    </div>
-  </div>
+  
 </div>
 
 <!-- 粒徑頁 -->
 <div id="ps" class="page">
-  <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
-    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v19</span>
-  </div>
-  <div class="ps-carbon-name">
-    <label>碳種名稱</label>
-    <input type="text" id="ps-carbon" placeholder="1240" value="1240">
-  </div>
 
-  <div class="card">
-    <div class="card-title">篩網重量輸入 (g)</div>
-    <div class="ps-table-wrap">
-      <table class="ps-input-table">
-        <thead>
-          <tr>
-            <th>篩網</th>
-            <th>μm</th>
-            <th>空重</th>
-            <th>空+樣品</th>
-            <th>樣品淨重</th>
-            <th>%</th>
-          </tr>
-        </thead>
-        <tbody id="ps-input-body">
-        </tbody>
-      </table>
-    </div>
-    <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-      <span style="font-size:12px; color:var(--text-dim);">總樣品重：</span>
-      <input type="number" id="ps-total" placeholder="自動加總" step="0.001"
-        style="flex:1; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:14px; font-weight:700; text-align:center; outline:none;" readonly>
-      <span style="font-size:12px; color:var(--text-dim);">g</span>
-      <button id="lock-empty-btn" onclick="toggleEmptyLock()" style="padding:8px 10px; background:var(--card); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; cursor:pointer;">🔒 鎖定空重</button>
-    </div>
-  </div>
-
-  <div style="display:flex; gap:8px; margin-bottom:0;">
-    <button onclick="clearPsData()" style="flex:1; padding:14px 18px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap;">清除</button>
-  </div>
-
+  <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
   <div class="card" id="ps-result" style="display:none"><!-- shown by calcParticleSize -->
     <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v19</span> — <span id="ps-out-carbon">—</span></div>
 
@@ -656,10 +627,76 @@ if ('serviceWorker' in navigator) {
       </table>
     </div>
   </div>
+
+  <div style="text-align:right; padding:4px 0 2px; font-size:12px; color:var(--text-dim);">
+    粒徑分析 <span style="background:#5b8def; color:white; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700;">v19</span>
+  </div>
+  <div class="ps-carbon-name">
+    <label>碳種名稱</label>
+    <input type="text" id="ps-carbon" placeholder="1240" value="1240">
+  </div>
+
+  <div class="card">
+    <div class="card-title">篩網重量輸入 (g)</div>
+    <div class="ps-table-wrap">
+      <table class="ps-input-table">
+        <thead>
+          <tr>
+            <th>篩網</th>
+            <th>μm</th>
+            <th>空重</th>
+            <th>空+樣品</th>
+            <th>樣品淨重</th>
+            <th>%</th>
+          </tr>
+        </thead>
+        <tbody id="ps-input-body">
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
+      <span style="font-size:12px; color:var(--text-dim);">總樣品重：</span>
+      <input type="number" id="ps-total" placeholder="自動加總" step="0.001"
+        style="flex:1; background:var(--card); border:1px solid var(--border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:14px; font-weight:700; text-align:center; outline:none;" readonly>
+      <span style="font-size:12px; color:var(--text-dim);">g</span>
+      <button id="lock-empty-btn" onclick="toggleEmptyLock()" style="padding:8px 10px; background:var(--card); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:12px; cursor:pointer;">🔒 鎖定空重</button>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; margin-bottom:0;">
+    <button onclick="clearPsData()" style="flex:1; padding:14px 18px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; white-space:nowrap;">清除</button>
+  </div>
+
+  
 </div>
 
 <!-- 小蘇打頁 -->
 <div id="bs" class="page">
+
+  <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
+  <div class="card" id="bs-result">
+    <div class="card-title">📊 計算結果</div>
+
+    <!-- 粒徑結果 -->
+    <div style="font-size:12px;color:var(--text-dim);font-weight:600;margin-bottom:6px;">粒徑分析</div>
+    <div class="ps-table-wrap" style="margin-bottom:14px;">
+      <table class="ps-result-table">
+        <thead><tr><th>Mesh</th><th>樣品(g)</th><th>分析值(%)</th></tr></thead>
+        <tbody id="bs-result-body"></tbody>
+      </table>
+    </div>
+
+    <!-- 其他結果 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div class="ps-out-card"><div class="oc-label">水份</div><div class="oc-val" id="bs-r-moisture">—</div><div class="oc-unit">%</div></div>
+      <div class="ps-out-card"><div class="oc-label">CL</div><div class="oc-val" id="bs-r-cl">—</div><div class="oc-unit">ppm</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="ps-out-card highlight"><div class="oc-label">純度</div><div class="oc-val" id="bs-r-purity">—</div><div class="oc-unit">%</div></div>
+      <div class="ps-out-card"><div class="oc-label">密度</div><div class="oc-val" id="bs-r-density">—</div><div class="oc-unit">g/ml</div></div>
+    </div>
+  </div>
+
 
   <!-- 粒徑分析 -->
   <div class="card">
@@ -729,28 +766,7 @@ if ('serviceWorker' in navigator) {
 
   <button onclick="clearBS()" style="width:100%; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; margin-bottom:0;">清除</button>
 
-  <div class="card" id="bs-result">
-    <div class="card-title">📊 計算結果</div>
-
-    <!-- 粒徑結果 -->
-    <div style="font-size:12px;color:var(--text-dim);font-weight:600;margin-bottom:6px;">粒徑分析</div>
-    <div class="ps-table-wrap" style="margin-bottom:14px;">
-      <table class="ps-result-table">
-        <thead><tr><th>Mesh</th><th>樣品(g)</th><th>分析值(%)</th></tr></thead>
-        <tbody id="bs-result-body"></tbody>
-      </table>
-    </div>
-
-    <!-- 其他結果 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-      <div class="ps-out-card"><div class="oc-label">水份</div><div class="oc-val" id="bs-r-moisture">—</div><div class="oc-unit">%</div></div>
-      <div class="ps-out-card"><div class="oc-label">CL</div><div class="oc-val" id="bs-r-cl">—</div><div class="oc-unit">ppm</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-      <div class="ps-out-card highlight"><div class="oc-label">純度</div><div class="oc-val" id="bs-r-purity">—</div><div class="oc-unit">%</div></div>
-      <div class="ps-out-card"><div class="oc-label">密度</div><div class="oc-val" id="bs-r-density">—</div><div class="oc-unit">g/ml</div></div>
-    </div>
-  </div>
+  
 
 </div>
 
