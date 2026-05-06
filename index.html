@@ -147,6 +147,7 @@ if ('serviceWorker' in navigator) {
   table { width:100%; border-collapse:separate; border-spacing:0; }
   th { position:sticky; top:0; padding:10px 7px; background:rgba(10,11,28,.90); color:var(--accent); font-size:10px; font-weight:950; white-space:nowrap; }
   td { padding:8px 6px; border-top:1px solid rgba(99,102,241,.10); color:var(--text-dim); font-size:11px; font-weight:800; text-align:center; white-space:nowrap; }
+  td.green, td.bold { color: var(--accent3); font-weight: 950; }
   tr:nth-child(even) td { background:rgba(99,102,241,.035); }
   .ps-input-table input { min-width:70px; min-height:36px; padding:6px 7px; font-size:14px; }
   .bs-inline-result { margin-bottom:9px; }
@@ -182,7 +183,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v28</div>
+  <div class="app-version">v29</div>
 </div>
 
 <div class="tabs">
@@ -644,14 +645,18 @@ function calcParticleSize() {
     return raw === '' || isNaN(v) ? 0 : v;
   });
 
-  const grandTotal = netWeights.reduce((a, b) => a + b, 0);
-  if (grandTotal <= 0) return;
+  const hasData = DEFAULT_MESH.some((_, i) =>
+    document.getElementById(`ps-total-w-${i}`).value.trim() !== ''
+  );
+  if (!hasData) return;
 
-  // 各 mesh 百分比
+  const grandTotal = netWeights.reduce((a, b) => a + b, 0);
+
+  // 各 mesh 百分比（grandTotal<=0 時先填 0，等後面顯示 — ）
   const meshData = DEFAULT_MESH.map((m, i) => ({
     ...m,
     net: netWeights[i],
-    pct: (netWeights[i] / grandTotal) * 100
+    pct: grandTotal > 0 ? (netWeights[i] / grandTotal) * 100 : 0
   }));
 
   // 累積保留%：先加自己再存（mesh12=第一個=自己全部=0.62%）
@@ -702,15 +707,16 @@ function calcParticleSize() {
   const D60 = findD(60);
   const UC = D10 > 0 ? (D60 / D10) : 0;
 
-  // 填結果表格（由大到小）
+  // 填結果表格（負值顯示紅色，grandTotal<=0 時 % 欄顯示 —）
   const tbody = document.getElementById('ps-table-body');
   tbody.innerHTML = '';
   meshData.forEach(m => {
     const tr = document.createElement('tr');
+    const pctText = grandTotal > 0 ? m.pct.toFixed(2) + '%' : '—';
     tr.innerHTML = `
       <td>${m.mesh}</td>
       <td class="${m.net < 0 ? 'neg-val' : ''}">${m.net.toFixed(3)}</td>
-      <td class="bold ${m.pct < 0 ? 'neg-val' : ''}">${m.pct.toFixed(2)}%</td>
+      <td class="bold ${m.pct < 0 ? 'neg-val' : ''}">${pctText}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -721,19 +727,16 @@ function calcParticleSize() {
   totalRow.innerHTML = `
     <td>總計</td>
     <td class="${grandTotal < 0 ? 'neg-val' : ''}">${grandTotal.toFixed(3)}</td>
-    <td>${meshData.reduce((s,m)=>s+m.pct,0).toFixed(2)}%</td>
+    <td>${grandTotal > 0 ? meshData.reduce((s,m)=>s+m.pct,0).toFixed(2) + '%' : '—'}</td>
   `;
   tbody.appendChild(totalRow);
 
+  document.getElementById('ps-result').style.display = 'block';
+
+  if (grandTotal <= 0) return; // 資料異常，不計算 D10/D60/UC
+
   // 更新數值
   document.getElementById('ps-out-carbon').textContent = carbonName;
-  document.getElementById('ps-12x40').textContent = frac1240.toFixed(2) + '%';
-  document.getElementById('ps-d10').textContent = (D10/1000).toFixed(3);
-  document.getElementById('ps-d60').textContent = (D60/1000).toFixed(3);
-  document.getElementById('ps-uc').textContent = UC.toFixed(3);
-  document.getElementById('ps-eff').textContent = (D10/1000).toFixed(3);
-
-  document.getElementById('ps-result').style.display = 'block';
 }
 
 function updateDisplay() {
@@ -844,9 +847,16 @@ function renderBSInput() {
 
 function bsCalcNet(idx) {
   const empty = +document.getElementById(`bs-empty-${idx}`).value || 0;
-  const total = +document.getElementById(`bs-total-${idx}`).value || 0;
-  const net = Math.max(0, total - empty);
-  document.getElementById(`bs-net-${idx}`).textContent = net > 0 ? net.toFixed(4) : '—';
+  const totalRaw = document.getElementById(`bs-total-${idx}`).value.trim();
+  const cell = document.getElementById(`bs-net-${idx}`);
+  if (totalRaw === '') {
+    cell.textContent = '—';
+    cell.classList.remove('neg-val');
+  } else {
+    const net = +totalRaw - empty;
+    cell.textContent = net.toFixed(4);
+    cell.classList.toggle('neg-val', net < 0);
+  }
   calcBS();
 }
 
@@ -880,8 +890,8 @@ function calcBS() {
   // 粒徑
   const nets = BS_MESH.map((_, i) => {
     const empty = +document.getElementById(`bs-empty-${i}`).value || 0;
-    const total = +document.getElementById(`bs-total-${i}`).value || 0;
-    return Math.max(0, total - empty);
+    const totalRaw = document.getElementById(`bs-total-${i}`).value.trim();
+    return totalRaw === '' ? 0 : +totalRaw - empty;
   });
   const totalW = nets.reduce((a, b) => a + b, 0);
   document.getElementById('bs-total-w').textContent = totalW.toFixed(4);
@@ -890,13 +900,14 @@ function calcBS() {
   tbody.innerHTML = '';
   BS_MESH.forEach((m, i) => {
     const pct = totalW > 0 ? nets[i] / totalW * 100 : 0;
+    const pctText = totalW > 0 ? pct.toFixed(2) + '%' : '—';
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${m.mesh}</td><td>${nets[i].toFixed(4)}</td><td class="green">${pct.toFixed(2)}%</td>`;
+    tr.innerHTML = `<td>${m.mesh}</td><td class="${nets[i] < 0 ? 'neg-val' : ''}">${nets[i].toFixed(4)}</td><td class="green ${pct < 0 ? 'neg-val' : ''}">${pctText}</td>`;
     tbody.appendChild(tr);
   });
   const totRow = document.createElement('tr');
   totRow.className = 'total-row';
-  totRow.innerHTML = `<td>總計</td><td>${totalW.toFixed(4)}</td><td>100%</td>`;
+  totRow.innerHTML = `<td>總計</td><td class="${totalW < 0 ? 'neg-val' : ''}">${totalW.toFixed(4)}</td><td>${totalW > 0 ? '100%' : '—'}</td>`;
   tbody.appendChild(totRow);
 
   // 水份
