@@ -25,7 +25,7 @@ if ('serviceWorker' in navigator) {
     --muted: rgba(148, 153, 255, .55);
     --accent: #6366f1;
     --accent2: #60a5fa;
-    --accent3: #34d399;
+    --accent3: #4ade80;
     --danger: #f87171;
     --shadow: 0 18px 55px rgba(0, 0, 0, .55), 0 0 32px rgba(99, 102, 241, .10);
     --glow: 0 0 0 1px rgba(99,102,241,.18), 0 0 26px rgba(99,102,241,.18), 0 0 48px rgba(96,165,250,.08);
@@ -98,13 +98,13 @@ if ('serviceWorker' in navigator) {
   #iodine-result .r2-focus { display:flex !important; flex-direction:column; align-items:center; justify-content:center; min-height:112px; }
   #iodine-result .sub { display:none; }
   #iodine-result .detail-item:has(#iv-r2) .d-label { font-size:13px; color:var(--accent2); margin-bottom:8px; }
-  #iodine-result #iv-r2 { font-size:clamp(28px,8vw,42px); color:var(--accent3); text-shadow:0 0 18px rgba(52,211,153,.30); }
+  #iodine-result #iv-r2 { font-size:clamp(28px,8vw,42px); color:var(--accent3); text-shadow:0 0 22px rgba(74,222,128,.45); }
 
   .result-box { text-align:center; padding:14px 10px; border-radius:18px; background:rgba(99,102,241,.08); border:1px solid rgba(99,102,241,.24); box-shadow:var(--glow); }
   .result-box .label, .d-label, .oc-label, .r-label, .w-label, .const-item label, .inp-group label, .ps-carbon-name label { display:block; margin-bottom:6px; color:var(--text-dim); font-size:11px; font-weight:850; }
-  .value, .r-val, .oc-val, .frac-val { font-size:clamp(30px,9vw,46px); line-height:1; font-weight:950; letter-spacing:-1.2px; color:var(--accent); text-shadow:0 0 18px rgba(99,102,241,.36); }
+  .value, .r-val, .oc-val, .frac-val { font-size:clamp(30px,9vw,46px); line-height:1; font-weight:950; letter-spacing:-1.2px; color:var(--accent3); text-shadow:0 0 22px rgba(74,222,128,.45); }
   .unit, .r-unit, .oc-unit, .sub { color:var(--muted); font-size:11px; font-weight:800; }
-  .d-val { color:#eef0ff; font-size:18px; font-weight:950; }
+  .d-val { color:var(--accent3); font-size:18px; font-weight:950; text-shadow:0 0 14px rgba(74,222,128,.35); }
 
   .const-grid, .detail-grid, .ps-out-grid, .res2-grid { display:grid; gap:9px; }
   .const-grid { grid-template-columns:repeat(3,1fr); }
@@ -182,7 +182,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v27</div>
+  <div class="app-version">v28</div>
 </div>
 
 <div class="tabs">
