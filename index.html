@@ -178,13 +178,17 @@ if ('serviceWorker' in navigator) {
     .row-num { font-size:11px; }
     table { min-width:500px; }
   }
+
+  .neg-val { color: var(--danger) !important; text-shadow: 0 0 14px rgba(255,59,99,.32); font-weight:950 !important; }
+  #iodine-result .r2-focus { display:flex !important; flex-direction:column; align-items:center; justify-content:center; min-height:112px; }
+
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v23</div>
+  <div class="app-version">v24</div>
 </div>
 
 <div class="tabs">
@@ -344,53 +348,18 @@ if ('serviceWorker' in navigator) {
 
   <!-- 計算結果移到最上方，避免手機鍵盤遮住 -->
   <div class="card" id="ps-result" style="display:none"><!-- shown by calcParticleSize -->
-    <div class="card-title" id="ps-result-title">📊 粒徑分佈 <span id="ps-out-carbon" style="display:none">—</span></div>
-
-    <!-- 12x40 醒目區塊 -->
-    <div class="ps-fraction-row">
-      <span class="frac-label">12×40 mesh 粒徑</span>
-      <span class="frac-val" id="ps-12x40">— %</span>
+    <div class="card-title" id="ps-result-title">📊 粒徑結果 <span id="ps-out-carbon" style="display:none">—</span></div>
+    <div style="display:none">
+      <span id="ps-12x40">— %</span>
+      <span id="ps-d10">—</span>
+      <span id="ps-d60">—</span>
+      <span id="ps-uc">—</span>
+      <span id="ps-eff">—</span>
     </div>
-
-    <!-- 關鍵數值 -->
-    <div class="ps-out-grid">
-      <div class="ps-out-card">
-        <div class="oc-label">D10</div>
-        <div class="oc-val" id="ps-d10">—</div>
-        <div class="oc-unit">mm</div>
-      </div>
-      <div class="ps-out-card">
-        <div class="oc-label">D60</div>
-        <div class="oc-val" id="ps-d60">—</div>
-        <div class="oc-unit">mm</div>
-      </div>
-      <div class="ps-out-card highlight">
-        <div class="oc-label">均勻係數 UC</div>
-        <div class="oc-val" id="ps-uc">—</div>
-        <div class="oc-unit">D60 / D10</div>
-      </div>
-      <div class="ps-out-card">
-        <div class="oc-label">有效尺寸</div>
-        <div class="oc-val" id="ps-eff">—</div>
-        <div class="oc-unit">mm</div>
-      </div>
-    </div>
-
-    <!-- 各篩網% 表格 -->
     <div class="ps-table-wrap">
       <table class="ps-result-table">
-        <thead>
-          <tr>
-            <th>Mesh</th>
-            <th>μm</th>
-            <th>樣品(g)</th>
-            <th>保留(%)</th>
-            <th>累積保留(%)</th>
-            <th>通過(%)</th>
-          </tr>
-        </thead>
-        <tbody id="ps-table-body">
-        </tbody>
+        <thead><tr><th>Mesh</th><th>樣品(g)</th><th>分析值(%)</th></tr></thead>
+        <tbody id="ps-table-body"></tbody>
       </table>
     </div>
   </div>
@@ -554,7 +523,17 @@ function switchTab(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(name).classList.add('active');
   event.target.classList.add('active');
-  if (name === 'ps') renderMeshInput();
+  if (name === 'ps') 
+// Robust iodine auto-calc fallback (mobile/iOS): inline oninput remains, this catches change/input/composition edge cases.
+['w1','v1','w2','v2','w3','v3'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el && !el.dataset.ivFallbackBound) {
+    el.dataset.ivFallbackBound = '1';
+    ['input','change','keyup'].forEach(evt => el.addEventListener(evt, calcIodine));
+  }
+});
+
+renderMeshInput();
   if (name === 'bs') renderBSInput();
 }
 
@@ -620,26 +599,46 @@ function renderMeshInput() {
 }
 
 function calcNet(idx) {
-  const empty = +document.getElementById(`ps-empty-${idx}`).value || 0;
-  const total = +document.getElementById(`ps-total-w-${idx}`).value || 0;
-  const net = Math.max(0, total - empty);
-  document.getElementById(`ps-net-${idx}`).value = net.toFixed(3);
+  const emptyEl = document.getElementById(`ps-empty-${idx}`);
+  const totalEl = document.getElementById(`ps-total-w-${idx}`);
+  const netEl = document.getElementById(`ps-net-${idx}`);
+  const pctEl = document.getElementById(`ps-pct-${idx}`);
+  const empty = +emptyEl.value || 0;
+  const totalRaw = totalEl.value.trim();
 
-  // 重新計算總樣品重
+  if (totalRaw === '' || isNaN(+totalRaw)) {
+    netEl.value = '';
+    netEl.classList.remove('neg-val');
+    pctEl.textContent = '—';
+  } else {
+    const net = (+totalRaw) - empty;
+    netEl.value = net.toFixed(3);
+    netEl.classList.toggle('neg-val', net < 0);
+  }
+
+  // 重新計算總樣品重：負數也保留，方便抓出不合理數據
   let grandTotal = 0;
   DEFAULT_MESH.forEach((_, i) => {
-    const n = +document.getElementById(`ps-net-${i}`).value || 0;
+    const raw = document.getElementById(`ps-net-${i}`).value;
+    const n = raw === '' || isNaN(+raw) ? 0 : +raw;
     grandTotal += n;
   });
   document.getElementById('ps-total').value = grandTotal.toFixed(3);
 
-  // 更新%
+  // 更新所有 %，不要只更新目前列，避免總重改變後舊百分比不準
   const totalW = +document.getElementById('ps-total').value || 0;
-  if (totalW > 0) {
-    document.getElementById(`ps-pct-${idx}`).textContent = ((net / totalW) * 100).toFixed(2) + '%';
-  } else {
-    document.getElementById(`ps-pct-${idx}`).textContent = '—';
-  }
+  DEFAULT_MESH.forEach((_, i) => {
+    const raw = document.getElementById(`ps-net-${i}`).value;
+    const n = raw === '' || isNaN(+raw) ? 0 : +raw;
+    const pct = document.getElementById(`ps-pct-${i}`);
+    if (raw !== '' && totalW !== 0) {
+      pct.textContent = ((n / totalW) * 100).toFixed(2) + '%';
+      pct.classList.toggle('neg-val', n < 0);
+    } else {
+      pct.textContent = '—';
+      pct.classList.remove('neg-val');
+    }
+  });
   calcParticleSize();
 }
 
@@ -648,8 +647,9 @@ function calcParticleSize() {
 
   // 抓各 mesh 淨重
   const netWeights = DEFAULT_MESH.map((m, i) => {
-    const v = +document.getElementById(`ps-net-${i}`).value;
-    return isNaN(v) || v < 0 ? 0 : v;
+    const raw = document.getElementById(`ps-net-${i}`).value;
+    const v = +raw;
+    return raw === '' || isNaN(v) ? 0 : v;
   });
 
   const grandTotal = netWeights.reduce((a, b) => a + b, 0);
@@ -717,11 +717,8 @@ function calcParticleSize() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${m.mesh}</td>
-      <td>${m.um}</td>
-      <td>${m.net.toFixed(3)}</td>
-      <td class="bold">${m.pct.toFixed(2)}%</td>
-      <td>${m.cumRetain.toFixed(2)}%</td>
-      <td class="green">${m.passPct.toFixed(2)}%</td>
+      <td class="${m.net < 0 ? 'neg-val' : ''}">${m.net.toFixed(3)}</td>
+      <td class="bold ${m.pct < 0 ? 'neg-val' : ''}">${m.pct.toFixed(2)}%</td>
     `;
     tbody.appendChild(tr);
   });
@@ -730,11 +727,9 @@ function calcParticleSize() {
   const totalRow = document.createElement('tr');
   totalRow.className = 'total-row';
   totalRow.innerHTML = `
-    <td colspan="2">總計</td>
-    <td>${grandTotal.toFixed(3)}</td>
+    <td>總計</td>
+    <td class="${grandTotal < 0 ? 'neg-val' : ''}">${grandTotal.toFixed(3)}</td>
     <td>${meshData.reduce((s,m)=>s+m.pct,0).toFixed(2)}%</td>
-    <td>—</td>
-    <td>—</td>
   `;
   tbody.appendChild(totalRow);
 
