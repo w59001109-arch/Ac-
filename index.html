@@ -150,7 +150,6 @@ if ('serviceWorker' in navigator) {
 
   .ps-table-wrap { overflow-x:auto; border-radius:16px; border:1px solid rgba(0,255,156,.16); background:rgba(0,0,0,.24); }
   table { width:100%; border-collapse:separate; border-spacing:0; }
-  .ps-input-table { min-width: 400px; }
   th { position:sticky; top:0; padding:10px 7px; background:rgba(0,28,22,.88); color:var(--accent); font-size:10px; font-weight:950; white-space:nowrap; }
   td { padding:8px 6px; border-top:1px solid rgba(0,255,156,.10); color:var(--text-dim); font-size:11px; font-weight:800; text-align:center; white-space:nowrap; }
   tr:nth-child(even) td { background:rgba(0,255,156,.035); }
@@ -177,7 +176,6 @@ if ('serviceWorker' in navigator) {
     #iodine .data-row .inp-group label { font-size:9px; }
     #iodine .data-row input { min-height:36px; font-size:15px; padding:6px; }
     .row-num { font-size:11px; }
-    .ps-input-table { min-width:380px; }
   }
 
   .neg-val { color: var(--danger) !important; text-shadow: 0 0 14px rgba(255,59,99,.32); font-weight:950 !important; }
@@ -189,7 +187,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v25</div>
+  <div class="app-version">v26</div>
 </div>
 
 <div class="tabs">
@@ -375,8 +373,6 @@ if ('serviceWorker' in navigator) {
             <th>μm</th>
             <th>空重</th>
             <th>空+樣品</th>
-            <th>樣品淨重</th>
-            <th>%</th>
           </tr>
         </thead>
         <tbody id="ps-input-body">
@@ -592,8 +588,8 @@ function renderMeshInput() {
       <td>${m.um}</td>
       <td><input type="number" id="ps-empty-${i}" placeholder="0.000" step="0.001" value="${m.empty}" tabindex="-1" ${emptyLocked ? 'readonly' : ''} oninput="calcNet(${i})"></td>
       <td><input type="text" inputmode="decimal" enterkeyhint="next" id="ps-total-w-${i}" placeholder="0.000" oninput="calcNet(${i});psAutoAdv(this)" onkeydown="psEnterAdv(event,this)"></td>
-      <td><input type="number" id="ps-net-${i}" readonly placeholder="—"></td>
-      <td><span id="ps-pct-${i}" style="color:var(--green);font-weight:700;">—</span></td>
+      <td style="display:none"><input type="number" id="ps-net-${i}" readonly></td>
+      <td style="display:none"><span id="ps-pct-${i}">—</span></td>
     `;
     tbody.appendChild(tr);
   });
