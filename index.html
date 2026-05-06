@@ -449,6 +449,8 @@ if ('serviceWorker' in navigator) {
     </div>
   </div>
 
+  <button onclick="clearIodine()" style="width:100%; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; margin-bottom:0;">清除</button>
+
   <div class="card" id="iodine-result">
     <div class="result-box">
       <div class="label">碘值 (Iodine Value)</div>
@@ -509,6 +511,8 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>
   </div>
+
+  <button onclick="clearMA()" style="width:100%; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; margin-bottom:0;">清除</button>
 
   <div class="card" id="ma-result">
     <div class="res2-grid">
@@ -688,6 +692,8 @@ if ('serviceWorker' in navigator) {
         <input type="text" inputmode="decimal" enterkeyhint="done" id="bs-den-tight" placeholder="13.6207" oninput="calcBS()"></div>
     </div>
   </div>
+
+  <button onclick="clearBS()" style="width:100%; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer; margin-bottom:0;">清除</button>
 
   <div class="card" id="bs-result">
     <div class="card-title">📊 計算結果</div>
@@ -1148,6 +1154,38 @@ function calcMA() {
   const ash = ((W4 - W1) / (W2 - water / 100)) * 100;
   document.getElementById('ma-water').textContent = water.toFixed(2);
   document.getElementById('ma-ash').textContent = ash.toFixed(2);
+}
+
+function clearIodine() {
+  ['w1','w2','w3','v1','v2','v3'].forEach(id => document.getElementById(id).value = '');
+  ['iv-val','iv-b','iv-a','iv-factor','iv-b2','iv-r2'].forEach(id => document.getElementById(id).textContent = '—');
+  const first = document.getElementById('w1');
+  if (first) { first.focus(); first.select(); }
+}
+
+function clearMA() {
+  ['mw1','mw2','mw3','mw4'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('ma-water').textContent = '—';
+  document.getElementById('ma-ash').textContent = '—';
+  const first = document.getElementById('mw1');
+  if (first) { first.focus(); first.select(); }
+}
+
+function clearBS() {
+  BS_MESH.forEach((_, i) => {
+    const t = document.getElementById(`bs-total-${i}`);
+    if (t) { t.value = ''; }
+    document.getElementById(`bs-net-${i}`).textContent = '—';
+  });
+  document.getElementById('bs-total-w').textContent = '—';
+  ['bs-m-empty','bs-m-sample','bs-m-total',
+   'bs-cl-sample','bs-cl-test',
+   'bs-pur-sample','bs-pur-start','bs-pur-end',
+   'bs-den-loose','bs-den-tight'].forEach(id => document.getElementById(id).value = '');
+  ['bs-r-moisture','bs-r-cl','bs-r-purity','bs-r-density'].forEach(id => document.getElementById(id).textContent = '—');
+  document.getElementById('bs-result-body').innerHTML = '';
+  const first = document.getElementById('bs-total-0');
+  if (first) { first.focus(); first.select(); }
 }
 
 
