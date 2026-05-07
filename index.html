@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v48</div>
+  <div class="app-version">v49</div>
 </div>
 
 <div class="tabs">
@@ -543,7 +543,7 @@ if ('serviceWorker' in navigator) {
     </div>
     <img id="cam-preview" class="cam-preview" alt="照片預覽">
     <div class="cam-status" id="cam-status">等待拍照</div>
-    <div class="cam-small">建議格式：每行寫「35 314.2」、「80 316.5」這種 Mesh + 空+樣品；小數點寫清楚。</div>
+    <div id="cam-hint" class="cam-small">建議格式：每行寫「35 314.2」、「80 316.5」這種 Mesh + 空+樣品；小數點寫清楚。</div>
   </div>
 
   <div class="card">
@@ -1098,6 +1098,14 @@ function camSetTarget(t) {
   document.getElementById('cam-apply-note').textContent = t === 'bs'
     ? '套用後會自動切到「小蘇打」頁並觸發原本計算。若辨識錯，先在這裡改數字再套用。'
     : '套用後會自動切到「粒徑」頁並觸發原本計算。若辨識錯，先在這裡改數字再套用。';
+  const hint = document.getElementById('cam-hint');
+  if (hint) hint.textContent = t === 'bs'
+    ? '建議格式：每行寫「35 314.2」、「80 316.5」這種 Mesh + 空+樣品；小數點寫清楚。'
+    : '建議格式：每行寫「12 322.0」、「14 316.7」這種 Mesh + 空+樣品；小數點寫清楚。';
+  const ta = document.getElementById('cam-ocr-text');
+  if (ta) ta.placeholder = t === 'bs'
+    ? '辨識文字會出現在這裡；也可以手動貼上，例如：\n35 314.2\n80 316.5\n100 302.1\n120 287.4\n140 290.2\n200 279.8\n230 283.0\n底 360.1'
+    : '辨識文字會出現在這裡；也可以手動貼上，例如：\n12 322.0\n14 316.7\n16 319.1\n20 331.3\n30 310.6\n40 311.2\n底 358.8';
   const tbody = document.getElementById('cam-body');
   if (tbody) { tbody.innerHTML = ''; delete tbody.dataset.ready; }
   camEnsureRows();
@@ -1229,8 +1237,10 @@ function camApplyAiRows(rows) {
     const val = r.total;
     if (mesh && val !== null && val !== undefined && val !== '') byMesh[mesh] = val;
   });
-  BS_MESH.forEach((m, i) => {
-    const input = document.getElementById(`cam-total-${i}`);
+  const meshArr = camTarget === 'bs' ? BS_MESH : DEFAULT_MESH;
+  const prefix = camTarget === 'bs' ? 'cam-total-' : 'cam-ps-total-';
+  meshArr.forEach((m, i) => {
+    const input = document.getElementById(`${prefix}${i}`);
     const val = byMesh[String(m.mesh)];
     if (input && val !== undefined && val !== null && val !== '') {
       input.value = String(val);
