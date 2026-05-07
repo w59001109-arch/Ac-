@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v45</div>
+  <div class="app-version">v46</div>
 </div>
 
 <div class="tabs">
@@ -530,7 +530,7 @@ if ('serviceWorker' in navigator) {
       先拍筆記本上的小蘇打粒徑數據，MiniMax AI 辨識後會放到下方確認表。確認沒錯再按「套用到小蘇打粒徑」。<br>
       只套用 <b>空+樣品</b> 欄位；原本公式、結果區、其他頁面都不改。
     </div>
-    <input id="cam-file" type="file" accept="image/*" capture="environment" style="display:none" onchange="camPreviewImage(event)">
+    <input id="cam-file" type="file" accept="image/*" style="display:none" onchange="camPreviewImage(event)">
     <div class="cam-actions">
       <button class="cam-btn cam-primary" onclick="document.getElementById('cam-file').click()">📷 拍照 / 選照片</button>
       <button class="cam-btn" onclick="camRunOcr()">🔎 開始辨識</button>
