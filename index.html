@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v43</div>
+  <div class="app-version">v44</div>
 </div>
 
 <div class="tabs">
@@ -1221,7 +1221,7 @@ function camApplyAiRows(rows) {
 }
 
 async function camRunAiOcr() {
-  const dataUrl = await camCompressForAi(camImageFile);
+  const dataUrl = await camFileToDataUrl(camImageFile);
   const resp = await fetch(CAM_AI_OCR_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
