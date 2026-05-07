@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v50</div>
+  <div class="app-version">v51</div>
 </div>
 
 <div class="tabs">
@@ -1229,48 +1229,42 @@ function camCompressForAi(file) {
 
 function camApplyAiRows(rows) {
   camEnsureRows();
+  const meshArr = camTarget === 'bs' ? BS_MESH : DEFAULT_MESH;
+  const prefix = camTarget === 'bs' ? 'cam-total-' : 'cam-ps-total-';
+  const meshSet = new Set(meshArr.map(m => String(m.mesh)));
+
+  // Split AI rows into label-matched vs unmatched (positional fallback pool)
   const byMesh = {};
+  const unmatchedVals = [];
   (rows || []).forEach(r => {
     if (!r) return;
     const mesh = String(r.mesh || '').trim();
     const val = r.total;
-    if (mesh && val !== null && val !== undefined && val !== '') byMesh[mesh] = val;
+    if (val === null || val === undefined || val === '') return;
+    if (mesh && meshSet.has(mesh)) byMesh[mesh] = val;
+    else unmatchedVals.push(val);
   });
-  const meshArr = camTarget === 'bs' ? BS_MESH : DEFAULT_MESH;
-  const prefix = camTarget === 'bs' ? 'cam-total-' : 'cam-ps-total-';
 
-  // Try mesh-label matching first
-  let filled = 0;
-  const lines = [];
-  meshArr.forEach((m, i) => {
-    const input = document.getElementById(`${prefix}${i}`);
+  // First pass: fill by mesh label
+  const unfilledIdxs = [];
+  const lines = meshArr.map((m, i) => {
     const val = byMesh[String(m.mesh)];
-    if (input && val !== undefined && val !== null && val !== '') {
+    const input = document.getElementById(`${prefix}${i}`);
+    if (val !== undefined && input) {
       input.value = String(val);
-      lines.push(`${m.mesh} ${val}`);
-      filled++;
-    } else {
-      lines.push(`${m.mesh} `);
+      return `${m.mesh} ${val}`;
     }
+    unfilledIdxs.push(i);
+    return `${m.mesh} `;
   });
 
-  // Positional fallback: AI returned rows in order but with wrong/no mesh labels
-  if (filled === 0 && rows && rows.length > 0) {
-    const vals = rows.map(r => (r && r.total !== null && r.total !== undefined && r.total !== '') ? r.total : null);
-    const posLines = [];
-    meshArr.forEach((m, i) => {
-      const input = document.getElementById(`${prefix}${i}`);
-      const val = vals[i];
-      if (input && val !== null) {
-        input.value = String(val);
-        posLines.push(`${m.mesh} ${val}`);
-      } else {
-        posLines.push(`${m.mesh} `);
-      }
-    });
-    document.getElementById('cam-ocr-text').value = posLines.join('\n').trim();
-    return;
-  }
+  // Second pass: fill remaining gaps positionally from unmatched values
+  unfilledIdxs.forEach((idx, ui) => {
+    if (ui >= unmatchedVals.length) return;
+    const input = document.getElementById(`${prefix}${idx}`);
+    const val = unmatchedVals[ui];
+    if (input) { input.value = String(val); lines[idx] = `${meshArr[idx].mesh} ${val}`; }
+  });
 
   document.getElementById('cam-ocr-text').value = lines.join('\n').trim();
 }
