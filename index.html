@@ -69,7 +69,7 @@ if ('serviceWorker' in navigator) {
   .header h1 { position:relative; margin:0; font-size:clamp(22px,6vw,31px); font-weight:950; letter-spacing:-1px; color:#eef0ff; text-shadow:0 0 18px rgba(99,102,241,.50); }
   .app-version { position:relative; display:inline-flex; margin-top:10px; padding:4px 12px; border-radius:999px; border:1px solid rgba(99,102,241,.42); color:var(--accent); background:rgba(99,102,241,.10); font-size:12px; font-weight:900; box-shadow:0 0 20px rgba(99,102,241,.14); }
 
-  .tabs { position:sticky; top:max(8px, env(safe-area-inset-top)); z-index:50; display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:6px; margin-bottom:12px; border-radius:18px; border:1px solid rgba(99,102,241,.22); background:rgba(6,7,20,.82); box-shadow:var(--shadow); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+  .tabs { position:sticky; top:max(8px, env(safe-area-inset-top)); z-index:50; display:grid; grid-template-columns:repeat(5,1fr); gap:6px; padding:6px; margin-bottom:12px; border-radius:18px; border:1px solid rgba(99,102,241,.22); background:rgba(6,7,20,.82); box-shadow:var(--shadow); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
   .tab { min-height:40px; display:flex; align-items:center; justify-content:center; border-radius:13px; color:var(--text-dim); font-size:12px; font-weight:900; cursor:pointer; transition:.16s ease; }
   .tab.active { color:#fff; background:linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow:0 0 18px rgba(99,102,241,.36); }
   .tab:active { transform:scale(.97); }
@@ -153,6 +153,19 @@ if ('serviceWorker' in navigator) {
   .bs-inline-result { margin-bottom:9px; }
   .bs-inline-result .ps-out-card { margin-bottom:0; }
 
+
+  /* 相機辨識：獨立新功能，只把確認後的數字套用到小蘇打粒徑空+樣品欄 */
+  .cam-note { color:var(--text-dim); font-size:12px; line-height:1.55; margin-bottom:10px; }
+  .cam-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+  .cam-btn { min-height:44px; border-radius:14px !important; font-size:14px; font-weight:950; cursor:pointer; }
+  .cam-primary { color:#fff !important; background:linear-gradient(135deg,var(--accent),var(--accent2)) !important; box-shadow:0 0 22px rgba(99,102,241,.28) !important; }
+  .cam-preview { width:100%; max-height:280px; object-fit:contain; display:none; margin-top:10px; border-radius:16px; border:1px solid rgba(99,102,241,.24); background:rgba(0,0,0,.28); }
+  .cam-status { margin-top:8px; color:var(--accent2); font-size:12px; font-weight:850; min-height:18px; }
+  #cam-ocr-text { width:100%; min-height:112px; resize:vertical; padding:10px; border-radius:14px; border:1px solid rgba(99,102,241,.22); background:rgba(0,0,0,.38); color:#eef0ff; font-size:13px; line-height:1.45; outline:none; }
+  .cam-table input { min-width:86px; min-height:36px; padding:6px 7px; font-size:14px; }
+  .cam-small { color:var(--muted); font-size:11px; margin-top:6px; line-height:1.45; }
+  @media (max-width:560px) { .cam-actions { grid-template-columns:1fr; } }
+
   @media (max-width:560px) {
     body { padding-left:9px; padding-right:9px; }
     .header { padding:15px 12px 12px; border-radius:20px; }
@@ -183,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v29</div>
+  <div class="app-version">v34</div>
 </div>
 
 <div class="tabs">
@@ -191,6 +204,7 @@ if ('serviceWorker' in navigator) {
   <div class="tab" onclick="switchTab('ma')">水份灰份</div>
   <div class="tab" onclick="switchTab('ps')">粒徑</div>
   <div class="tab" onclick="switchTab('bs')">小蘇打</div>
+  <div class="tab" onclick="switchTab('cam')">相機辨識</div>
 </div>
 
 <!-- 碘值頁 -->
@@ -345,11 +359,21 @@ if ('serviceWorker' in navigator) {
   <div class="card" id="ps-result" style="display:none"><!-- shown by calcParticleSize -->
     <div class="card-title" id="ps-result-title">📊 粒徑結果 <span id="ps-out-carbon" style="display:none">—</span></div>
     <div style="display:none">
-      <span id="ps-12x40">— %</span>
       <span id="ps-d10">—</span>
       <span id="ps-d60">—</span>
-      <span id="ps-uc">—</span>
       <span id="ps-eff">—</span>
+    </div>
+    <div class="ps-out-grid" style="margin-bottom:10px;">
+      <div class="ps-out-card highlight">
+        <div class="oc-label">粒徑 14~40</div>
+        <div class="oc-val" id="ps-12x40">—</div>
+        <div class="oc-unit">分析值%加總</div>
+      </div>
+      <div class="ps-out-card highlight">
+        <div class="oc-label">均勻係數 UC</div>
+        <div class="oc-val" id="ps-uc">—</div>
+        <div class="oc-unit">D60 / D10</div>
+      </div>
     </div>
     <div class="ps-table-wrap">
       <table class="ps-result-table">
@@ -495,6 +519,50 @@ if ('serviceWorker' in navigator) {
 
   
 
+</div>
+
+
+<!-- 相機辨識頁：只針對小蘇打粒徑，不動原本計算架構 -->
+<div id="cam" class="page">
+  <div class="card">
+    <div class="card-title">📷 小蘇打粒徑 AI 相機辨識</div>
+    <div class="cam-note">
+      先拍筆記本上的小蘇打粒徑數據，MiniMax AI 辨識後會放到下方確認表。確認沒錯再按「套用到小蘇打粒徑」。<br>
+      只套用 <b>空+樣品</b> 欄位；原本公式、結果區、其他頁面都不改。
+    </div>
+    <input id="cam-file" type="file" accept="image/*" capture="environment" style="display:none" onchange="camPreviewImage(event)">
+    <div class="cam-actions">
+      <button class="cam-btn cam-primary" onclick="document.getElementById('cam-file').click()">📷 拍照 / 選照片</button>
+      <button class="cam-btn" onclick="camRunOcr()">🔎 開始辨識</button>
+    </div>
+    <img id="cam-preview" class="cam-preview" alt="照片預覽">
+    <div class="cam-status" id="cam-status">等待拍照</div>
+    <div class="cam-small">建議格式：每行寫「35 314.2」、「80 316.5」這種 Mesh + 空+樣品；小數點寫清楚。</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">辨識文字 / 可手動修正</div>
+    <textarea id="cam-ocr-text" placeholder="辨識文字會出現在這裡；也可以手動貼上，例如：&#10;35 314.2&#10;80 316.5&#10;100 302.1&#10;120 287.4&#10;140 290.2&#10;200 279.8&#10;230 283.0&#10;底 360.1"></textarea>
+    <div class="cam-actions">
+      <button class="cam-btn" onclick="camParseText()">🧠 解析到確認表</button>
+      <button class="cam-btn" onclick="camClear()">清除辨識</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">確認後套用</div>
+    <div class="ps-table-wrap">
+      <table class="ps-input-table cam-table">
+        <thead><tr><th>Mesh</th><th>原空重</th><th>辨識空+樣品</th></tr></thead>
+        <tbody id="cam-bs-body"></tbody>
+      </table>
+    </div>
+    <div class="cam-actions">
+      <button class="cam-btn cam-primary" onclick="camApplyToBS()">✅ 套用到小蘇打粒徑</button>
+      <button class="cam-btn" onclick="camFillExample()">範例測試</button>
+    </div>
+    <div class="cam-small">套用後會自動切到「小蘇打」頁並觸發原本計算。若辨識錯，先在這裡改數字再套用。</div>
+  </div>
 </div>
 
 <script>
@@ -737,6 +805,11 @@ function calcParticleSize() {
 
   // 更新數值
   document.getElementById('ps-out-carbon').textContent = carbonName;
+  document.getElementById('ps-12x40').textContent = frac1240.toFixed(2) + ' %';
+  document.getElementById('ps-d10').textContent = (D10 / 1000).toFixed(3);
+  document.getElementById('ps-d60').textContent = (D60 / 1000).toFixed(3);
+  document.getElementById('ps-uc').textContent = isFinite(UC) ? UC.toFixed(2) : '—';
+  document.getElementById('ps-eff').textContent = (D10 / 1000).toFixed(3);
 }
 
 function updateDisplay() {
@@ -1004,6 +1077,283 @@ function clearBS() {
   const first = document.getElementById('bs-total-0');
   if (first) { first.focus(); first.select(); }
 }
+
+
+// ── 相機辨識：小蘇打粒徑專用。只填入 bs-total-*，不改原本計算公式。 ──
+let camImageFile = null;
+let camTesseractLoading = null;
+const CAM_AI_OCR_ENDPOINT = 'https://treasury-tom-ticket-gmc.trycloudflare.com/ocr';
+
+function camSetStatus(msg) {
+  const el = document.getElementById('cam-status');
+  if (el) el.textContent = msg;
+}
+
+function camEnsureRows() {
+  const tbody = document.getElementById('cam-bs-body');
+  if (!tbody || tbody.dataset.ready === '1') return;
+  tbody.innerHTML = '';
+  BS_MESH.forEach((m, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${m.mesh}</td><td>${m.empty}</td><td><input type="text" inputmode="decimal" id="cam-total-${i}" placeholder="空+樣品"></td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.dataset.ready = '1';
+}
+
+function camPreviewImage(event) {
+  camEnsureRows();
+  const file = event.target.files && event.target.files[0];
+  camImageFile = file || null;
+  const img = document.getElementById('cam-preview');
+  if (!file || !img) { camSetStatus('沒有選到照片'); return; }
+  img.src = URL.createObjectURL(file);
+  img.style.display = 'block';
+  camSetStatus('照片已載入，按「開始辨識」');
+}
+
+function camLoadTesseract() {
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  if (camTesseractLoading) return camTesseractLoading;
+  camSetStatus('載入 OCR 模組中…第一次會比較慢');
+  camTesseractLoading = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.onload = () => resolve(window.Tesseract);
+    s.onerror = () => reject(new Error('OCR 模組載入失敗'));
+    document.head.appendChild(s);
+  });
+  return camTesseractLoading;
+}
+
+function camPreprocessImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const maxW = 1400;
+      const scale = Math.min(1, maxW / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < data.data.length; i += 4) {
+        const r = data.data[i], g = data.data[i + 1], b = data.data[i + 2];
+        let y = 0.299 * r + 0.587 * g + 0.114 * b;
+        // 高對比二值化：壓掉紙張陰影，保留深色筆跡，降低手寫 OCR 亂猜英文字母。
+        y = y < 185 ? 0 : 255;
+        data.data[i] = data.data[i + 1] = data.data[i + 2] = y;
+      }
+      ctx.putImageData(data, 0, 0);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('影像前處理失敗')), 'image/png');
+    };
+    img.onerror = () => reject(new Error('照片讀取失敗'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function camCleanOcrText(raw) {
+  // 第二層保險：就算 OCR 引擎亂吐英文字，也不要把亂碼塞到畫面。
+  // 常見手寫誤判先轉回數字，再只保留數字/小數點/逗號/空白/換行。
+  let s = String(raw || '')
+    .replace(/[Oo]/g, '0')
+    .replace(/[Il|]/g, '1')
+    .replace(/[Ss]/g, '5')
+    .replace(/[Bb]/g, '8')
+    .replace(/[Zz]/g, '2')
+    .replace(/[，]/g, '.')
+    .replace(/[^0-9.,\n\r\t ]+/g, ' ')
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/[ \t]+\n/g, '\n');
+  return s;
+}
+
+
+function camFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('照片讀取失敗'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function camCompressForAi(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1280;
+      const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => reject(new Error('照片讀取失敗'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function camApplyAiRows(rows) {
+  camEnsureRows();
+  const lines = [];
+  const byMesh = {};
+  (rows || []).forEach(r => {
+    if (!r) return;
+    const mesh = String(r.mesh || '').trim();
+    const val = r.total;
+    if (mesh && val !== null && val !== undefined && val !== '') byMesh[mesh] = val;
+  });
+  BS_MESH.forEach((m, i) => {
+    const input = document.getElementById(`cam-total-${i}`);
+    const val = byMesh[String(m.mesh)];
+    if (input && val !== undefined && val !== null && val !== '') {
+      input.value = String(val);
+      lines.push(`${m.mesh} ${val}`);
+    } else {
+      lines.push(`${m.mesh} `);
+    }
+  });
+  document.getElementById('cam-ocr-text').value = lines.join('\n').trim();
+}
+
+async function camRunAiOcr() {
+  const dataUrl = await camCompressForAi(camImageFile);
+  const resp = await fetch(CAM_AI_OCR_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: dataUrl })
+  });
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) throw new Error(data.error || `AI OCR HTTP ${resp.status}`);
+  camApplyAiRows(data.rows || []);
+  return data;
+}
+
+async function camRunOcr() {
+  camEnsureRows();
+  if (!camImageFile) { camSetStatus('請先拍照或選照片'); return; }
+  try {
+    camSetStatus('AI 辨識中…請等一下');
+    await camRunAiOcr();
+    camSetStatus('AI 辨識完成，請檢查下方確認表');
+    return;
+  } catch (aiErr) {
+    console.warn('AI OCR failed, fallback to Tesseract:', aiErr);
+    camSetStatus('AI 辨識失敗，改用備援 OCR…');
+  }
+  try {
+    const Tesseract = await camLoadTesseract();
+    camSetStatus('備援 OCR 辨識中…請等一下');
+    const imageForOcr = await camPreprocessImage(camImageFile);
+    const worker = await Tesseract.createWorker('eng', 1, {
+      logger: m => {
+        if (m.status === 'recognizing text') camSetStatus(`辨識中…${Math.round((m.progress || 0) * 100)}%`);
+      }
+    });
+    await worker.setParameters({
+      tessedit_char_whitelist: '0123456789., ',
+      tessedit_pageseg_mode: '6',
+      preserve_interword_spaces: '1'
+    });
+    const result = await worker.recognize(imageForOcr);
+    await worker.terminate();
+    const rawText = (result && result.data && result.data.text) || '';
+    const text = camCleanOcrText(rawText);
+    document.getElementById('cam-ocr-text').value = text.trim();
+    camSetStatus('辨識完成，請檢查下方確認表');
+    camParseText();
+  } catch (err) {
+    camSetStatus('辨識失敗：' + (err.message || err));
+  }
+}
+
+function camNumbersFromLine(line) {
+  return (line.match(/-?\d+(?:[\.,]\d+)?/g) || []).map(v => v.replace(',', '.')).map(Number).filter(v => !Number.isNaN(v));
+}
+
+function camParseText() {
+  camEnsureRows();
+  const text = document.getElementById('cam-ocr-text').value || '';
+  const lines = text.split(/\n+/).map(s => s.trim()).filter(Boolean);
+  const used = new Set();
+
+  BS_MESH.forEach((m, i) => {
+    let val = '';
+    const meshToken = String(m.mesh);
+    const lineIndex = lines.findIndex((line, idx) => {
+      if (used.has(idx)) return false;
+      if (meshToken === '底') return /底|pan|bottom/i.test(line);
+      return new RegExp(`(^|\\D)${meshToken}(\\D|$)`).test(line);
+    });
+    if (lineIndex !== -1) {
+      used.add(lineIndex);
+      let nums = camNumbersFromLine(lines[lineIndex]);
+      if (meshToken !== '底') nums = nums.filter(n => Math.abs(n - Number(meshToken)) > 0.0001);
+      // 同一行若有「Mesh 空重 空+樣品」，取最後一個數字；若只有一個數字，也取它。
+      if (nums.length) val = nums[nums.length - 1];
+    }
+    const input = document.getElementById(`cam-total-${i}`);
+    if (input && val !== '') input.value = String(val);
+  });
+
+  // 若沒有成功標籤解析，退而求其次：抓看起來像空+樣品重量的數字（>200，並排除 mesh 標號），依序塞入。
+  const filled = BS_MESH.some((_, i) => (document.getElementById(`cam-total-${i}`).value || '').trim() !== '');
+  if (!filled) {
+    const meshNums = new Set(BS_MESH.filter(m => m.mesh !== '底').map(m => Number(m.mesh)));
+    const nums = camNumbersFromLine(text).filter(n => n > 200 && !meshNums.has(Math.round(n)));
+    BS_MESH.forEach((_, i) => {
+      const input = document.getElementById(`cam-total-${i}`);
+      if (input && nums[i] != null) input.value = String(nums[i]);
+    });
+  }
+  camSetStatus('已解析到確認表，請確認數字後再套用');
+}
+
+function camApplyToBS() {
+  camEnsureRows();
+  const bsBody = document.getElementById('bs-input-body');
+  if (bsBody && !bsBody.children.length) renderBSInput();
+  BS_MESH.forEach((_, i) => {
+    const src = document.getElementById(`cam-total-${i}`);
+    const dst = document.getElementById(`bs-total-${i}`);
+    if (src && dst && src.value.trim() !== '') {
+      dst.value = src.value.trim();
+      bsCalcNet(i);
+    }
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('bs').classList.add('active');
+  const bsTab = Array.from(document.querySelectorAll('.tab')).find(t => t.textContent.includes('小蘇打'));
+  if (bsTab) bsTab.classList.add('active');
+  camSetStatus('已套用到小蘇打粒徑');
+}
+
+function camClear() {
+  document.getElementById('cam-ocr-text').value = '';
+  BS_MESH.forEach((_, i) => {
+    const input = document.getElementById(`cam-total-${i}`);
+    if (input) input.value = '';
+  });
+  camSetStatus('已清除');
+}
+
+function camFillExample() {
+  camEnsureRows();
+  const sample = ['314.2','316.5','302.1','287.4','290.2','279.8','283.0','360.1'];
+  sample.forEach((v, i) => {
+    const input = document.getElementById(`cam-total-${i}`);
+    if (input) input.value = v;
+  });
+  document.getElementById('cam-ocr-text').value = BS_MESH.map((m, i) => `${m.mesh} ${sample[i]}`).join('\n');
+  camSetStatus('已填入範例，可按套用測試流程');
+}
+
+document.addEventListener('DOMContentLoaded', camEnsureRows);
 
 
 </script>
