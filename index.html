@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v51</div>
+  <div class="app-version">v52</div>
 </div>
 
 <div class="tabs">
@@ -1293,7 +1293,12 @@ async function camRunOcr() {
   try {
     camSetStatus('AI 辨識中…請等一下');
     await camRunAiOcr();
-    camSetStatus('AI 辨識完成，請檢查下方確認表');
+    const meshArr = camTarget === 'bs' ? BS_MESH : DEFAULT_MESH;
+    const prefix = camTarget === 'bs' ? 'cam-total-' : 'cam-ps-total-';
+    const filledCount = meshArr.filter((_, i) => (document.getElementById(`${prefix}${i}`)?.value || '').trim() !== '').length;
+    camSetStatus(filledCount > 0
+      ? `AI 辨識完成 ${filledCount}/${meshArr.length} 列，請確認後套用`
+      : '⚠️ AI 辨識完成但沒讀到數字，請重新拍照');
     return;
   } catch (aiErr) {
     console.warn('AI OCR failed, fallback to Tesseract:', aiErr);
@@ -1355,8 +1360,8 @@ function camParseText() {
     if (input && val !== '') input.value = String(val);
   });
 
-  const filled = meshArr.some((_, i) => (document.getElementById(`${prefix}${i}`).value || '').trim() !== '');
-  if (!filled) {
+  const anyFilled = meshArr.some((_, i) => (document.getElementById(`${prefix}${i}`).value || '').trim() !== '');
+  if (!anyFilled) {
     const meshNums = new Set(meshArr.filter(m => m.mesh !== '底').map(m => Number(m.mesh)));
     const nums = camNumbersFromLine(text).filter(n => n > 200 && !meshNums.has(Math.round(n)));
     meshArr.forEach((_, i) => {
@@ -1364,7 +1369,10 @@ function camParseText() {
       if (input && nums[i] != null) input.value = String(nums[i]);
     });
   }
-  camSetStatus('已解析到確認表，請確認數字後再套用');
+  const filledCount = meshArr.filter((_, i) => (document.getElementById(`${prefix}${i}`)?.value || '').trim() !== '').length;
+  camSetStatus(filledCount > 0
+    ? `已解析 ${filledCount}/${meshArr.length} 列，請確認數字後再套用`
+    : '⚠️ 辨識不到數字，請重新拍照或手動貼上數字');
 }
 
 function camApplyToBS() {
