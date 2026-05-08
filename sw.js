@@ -19,3 +19,5 @@ self.addEventListener('fetch', e => {
 });
 
 /* cache-bump tailscale-https 2026-05-08T14:48:26.769605 */
+
+/* cache-bump v62 endpoint migration */
