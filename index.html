@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v56</div>
+  <div class="app-version">v57</div>
 </div>
 
 <div class="tabs">
@@ -1140,8 +1140,13 @@ async function camCheckServer() {
   if (dot) dot.style.background = '#64748b';
   if (label) label.textContent = '檢查中…';
   try {
-    const base = camGetEndpoint().replace(/\/ocr$/, '');
-    const resp = await fetch(base + '/health', { method: 'GET', signal: AbortSignal.timeout(5000) });
+    // Send empty POST to /ocr; expect any response (even 4xx) = server is up
+    const resp = await fetch(camGetEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ping: true }),
+      signal: AbortSignal.timeout(6000)
+    });
     if (dot) dot.style.background = '#4ade80';
     if (label) label.textContent = '伺服器正常';
   } catch (e) {
