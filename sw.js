@@ -17,3 +17,5 @@ self.addEventListener('fetch', e => {
   // 完全不 cache，全部走網路
   e.respondWith(fetch(e.request));
 });
+
+/* cache-bump tailscale-https 2026-05-08T14:48:26.769605 */
