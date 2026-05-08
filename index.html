@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v61</div>
+  <div class="app-version">v62</div>
 </div>
 
 <div class="tabs">
@@ -1127,7 +1127,13 @@ function camSetTarget(t) {
 }
 const CAM_AI_OCR_DEFAULT = 'https://camac-mini-1.tail766252.ts.net';
 function camGetBase() {
-  return (localStorage.getItem('cam_ocr_endpoint') || CAM_AI_OCR_DEFAULT).replace(/\/+$/, '');
+  const saved = (localStorage.getItem('cam_ocr_endpoint') || '').trim();
+  // v62: 舊版若曾儲存 HTTP/Tailscale IP，會覆蓋新版 HTTPS 預設並被 WebView 擋掉；自動遷移。
+  if (!saved || saved === 'http://100.70.60.112:8787' || saved.startsWith('http://100.70.60.112')) {
+    localStorage.setItem('cam_ocr_endpoint', CAM_AI_OCR_DEFAULT);
+    return CAM_AI_OCR_DEFAULT;
+  }
+  return saved.replace(/\/+$/, '');
 }
 function camGetEndpoint() { return camGetBase() + '/ocr'; }
 function camSaveEndpoint() {
