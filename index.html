@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v55</div>
+  <div class="app-version">v56</div>
 </div>
 
 <div class="tabs">
@@ -530,6 +530,11 @@ if ('serviceWorker' in navigator) {
       <button id="cam-target-bs" class="cam-btn cam-primary" onclick="camSetTarget('bs')">小蘇打粒徑</button>
       <button id="cam-target-ps" class="cam-btn" onclick="camSetTarget('ps')">活性碳粒徑</button>
     </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <span id="cam-server-dot" style="width:10px;height:10px;border-radius:50%;background:#64748b;display:inline-block;flex-shrink:0;"></span>
+      <span id="cam-server-label" style="font-size:.82em;color:#94a3b8;">檢查伺服器中…</span>
+      <button onclick="camCheckServer()" style="margin-left:auto;background:none;border:1px solid rgba(99,102,241,.3);border-radius:5px;color:var(--accent2);font-size:.75em;padding:2px 8px;cursor:pointer;">重新測試</button>
+    </div>
     <div class="cam-note">
       先選辨識目標，拍筆記本上的數據，MiniMax AI 辨識後放到確認表。確認沒錯再套用。<br>
       只套用 <b>空+樣品</b> 欄位；原本公式、其他頁面都不改。
@@ -599,7 +604,8 @@ function switchTab(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(name).classList.add('active');
   event.target.classList.add('active');
-  if (name === 'ps') 
+  if (name === 'cam') camCheckServer();
+  if (name === 'ps')
 // Robust iodine auto-calc fallback (mobile/iOS): inline oninput remains, this catches change/input/composition edge cases.
 ['w1','v1','w2','v2','w3','v3'].forEach(id => {
   const el = document.getElementById(id);
@@ -1128,6 +1134,22 @@ function camSaveEndpoint() {
   setTimeout(() => { const el = document.getElementById('cam-endpoint-status'); if(el) el.textContent = ''; }, 2000);
 }
 
+async function camCheckServer() {
+  const dot = document.getElementById('cam-server-dot');
+  const label = document.getElementById('cam-server-label');
+  if (dot) dot.style.background = '#64748b';
+  if (label) label.textContent = '檢查中…';
+  try {
+    const base = camGetEndpoint().replace(/\/ocr$/, '');
+    const resp = await fetch(base + '/health', { method: 'GET', signal: AbortSignal.timeout(5000) });
+    if (dot) dot.style.background = '#4ade80';
+    if (label) label.textContent = '伺服器正常';
+  } catch (e) {
+    if (dot) dot.style.background = '#f87171';
+    if (label) label.textContent = '伺服器無回應，請確認電腦與伺服器是否開啟';
+  }
+}
+
 function camSetStatus(msg) {
   const el = document.getElementById('cam-status');
   if (el) el.textContent = msg;
@@ -1472,6 +1494,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const saved = localStorage.getItem('cam_ocr_endpoint');
   const inp = document.getElementById('cam-endpoint-input');
   if (inp) inp.value = saved || '';
+  camCheckServer();
 });
 
 
