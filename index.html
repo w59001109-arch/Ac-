@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v59</div>
+  <div class="app-version">v60</div>
 </div>
 
 <div class="tabs">
@@ -1142,11 +1142,15 @@ async function camCheckServer() {
   const label = document.getElementById('cam-server-label');
   if (dot) dot.style.background = '#64748b';
   if (label) label.textContent = '檢查中…';
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 6000);
   try {
-    const resp = await fetch(camGetBase() + '/h', { signal: AbortSignal.timeout(6000) });
+    await fetch(camGetBase() + '/h', { signal: controller.signal });
+    clearTimeout(timer);
     if (dot) dot.style.background = '#4ade80';
     if (label) label.textContent = '伺服器正常';
   } catch (e) {
+    clearTimeout(timer);
     if (dot) dot.style.background = '#f87171';
     if (label) label.textContent = '伺服器無回應，請確認電腦與伺服器是否開啟';
   }
