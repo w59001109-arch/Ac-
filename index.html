@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v53</div>
+  <div class="app-version">v54</div>
 </div>
 
 <div class="tabs">
@@ -534,6 +534,15 @@ if ('serviceWorker' in navigator) {
       先選辨識目標，拍筆記本上的數據，MiniMax AI 辨識後放到確認表。確認沒錯再套用。<br>
       只套用 <b>空+樣品</b> 欄位；原本公式、其他頁面都不改。
     </div>
+    <details style="margin-bottom:8px;">
+      <summary style="color:var(--accent2);font-size:.85em;cursor:pointer;">⚙️ OCR 伺服器網址</summary>
+      <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
+        <input id="cam-endpoint-input" type="url" inputmode="url" placeholder="https://xxx.trycloudflare.com/ocr"
+          style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(99,102,241,.3);border-radius:6px;padding:6px 8px;color:#e2e8f0;font-size:.82em;">
+        <button class="cam-btn" style="padding:6px 12px;font-size:.82em;" onclick="camSaveEndpoint()">儲存</button>
+      </div>
+      <div id="cam-endpoint-status" style="font-size:.75em;color:var(--accent2);margin-top:4px;"></div>
+    </details>
     <input id="cam-file" type="file" accept="image/*" style="display:none" onchange="camPreviewImage(event)">
     <input id="cam-file-camera" type="file" accept="image/*" capture="environment" style="display:none" onchange="camPreviewImage(event)">
     <div class="cam-actions">
@@ -1110,7 +1119,14 @@ function camSetTarget(t) {
   if (tbody) { tbody.innerHTML = ''; delete tbody.dataset.ready; }
   camEnsureRows();
 }
-const CAM_AI_OCR_ENDPOINT = 'https://robots-joshua-appointments-solar.trycloudflare.com/ocr';
+const CAM_AI_OCR_DEFAULT = 'https://robots-joshua-appointments-solar.trycloudflare.com/ocr';
+function camGetEndpoint() { return localStorage.getItem('cam_ocr_endpoint') || CAM_AI_OCR_DEFAULT; }
+function camSaveEndpoint() {
+  const val = document.getElementById('cam-endpoint-input').value.trim();
+  if (val) { localStorage.setItem('cam_ocr_endpoint', val); document.getElementById('cam-endpoint-status').textContent = '已儲存 ✓'; }
+  else { localStorage.removeItem('cam_ocr_endpoint'); document.getElementById('cam-endpoint-status').textContent = '已恢復預設'; }
+  setTimeout(() => { const el = document.getElementById('cam-endpoint-status'); if(el) el.textContent = ''; }, 2000);
+}
 
 function camSetStatus(msg) {
   const el = document.getElementById('cam-status');
@@ -1272,14 +1288,14 @@ function camApplyAiRows(rows) {
 async function camRunAiOcr() {
   const dataUrl = await camCompressForAi(camImageFile);
   const meshArr = camTarget === 'bs' ? BS_MESH : DEFAULT_MESH;
-  const resp = await fetch(CAM_AI_OCR_ENDPOINT, {
+  const resp = await fetch(camGetEndpoint(), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       image: dataUrl,
       target: camTarget,
       meshes: meshArr.map(m => String(m.mesh))
-    })
+    }),
   });
   const data = await resp.json().catch(() => ({}));
   if (!resp.ok) throw new Error(data.error || `AI OCR HTTP ${resp.status}`);
@@ -1451,7 +1467,12 @@ function camFillExample() {
   camSetStatus('已填入範例，可按套用測試流程');
 }
 
-document.addEventListener('DOMContentLoaded', camEnsureRows);
+document.addEventListener('DOMContentLoaded', () => {
+  camEnsureRows();
+  const saved = localStorage.getItem('cam_ocr_endpoint');
+  const inp = document.getElementById('cam-endpoint-input');
+  if (inp) inp.value = saved || '';
+});
 
 
 </script>
