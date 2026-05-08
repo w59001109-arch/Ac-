@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v58</div>
+  <div class="app-version">v59</div>
 </div>
 
 <div class="tabs">
@@ -542,7 +542,7 @@ if ('serviceWorker' in navigator) {
     <details style="margin-bottom:8px;">
       <summary style="color:var(--accent2);font-size:.85em;cursor:pointer;">⚙️ OCR 伺服器網址</summary>
       <div style="display:flex;gap:6px;margin-top:6px;align-items:center;">
-        <input id="cam-endpoint-input" type="url" inputmode="url" placeholder="https://xxx.trycloudflare.com/ocr"
+        <input id="cam-endpoint-input" type="url" inputmode="url" placeholder="http://100.70.60.112:8787"
           style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(99,102,241,.3);border-radius:6px;padding:6px 8px;color:#e2e8f0;font-size:.82em;">
         <button class="cam-btn" style="padding:6px 12px;font-size:.82em;" onclick="camSaveEndpoint()">儲存</button>
       </div>
@@ -1125,8 +1125,11 @@ function camSetTarget(t) {
   if (tbody) { tbody.innerHTML = ''; delete tbody.dataset.ready; }
   camEnsureRows();
 }
-const CAM_AI_OCR_DEFAULT = 'http://100.70.60.112:8787/ocr';
-function camGetEndpoint() { return localStorage.getItem('cam_ocr_endpoint') || CAM_AI_OCR_DEFAULT; }
+const CAM_AI_OCR_DEFAULT = 'http://100.70.60.112:8787';
+function camGetBase() {
+  return (localStorage.getItem('cam_ocr_endpoint') || CAM_AI_OCR_DEFAULT).replace(/\/+$/, '');
+}
+function camGetEndpoint() { return camGetBase() + '/ocr'; }
 function camSaveEndpoint() {
   const val = document.getElementById('cam-endpoint-input').value.trim();
   if (val) { localStorage.setItem('cam_ocr_endpoint', val); document.getElementById('cam-endpoint-status').textContent = '已儲存 ✓'; }
@@ -1140,8 +1143,7 @@ async function camCheckServer() {
   if (dot) dot.style.background = '#64748b';
   if (label) label.textContent = '檢查中…';
   try {
-    const base = camGetEndpoint().replace(/\/ocr$/, '');
-    const resp = await fetch(base + '/h', { signal: AbortSignal.timeout(6000) });
+    const resp = await fetch(camGetBase() + '/h', { signal: AbortSignal.timeout(6000) });
     if (dot) dot.style.background = '#4ade80';
     if (label) label.textContent = '伺服器正常';
   } catch (e) {
