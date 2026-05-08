@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v54</div>
+  <div class="app-version">v55</div>
 </div>
 
 <div class="tabs">
@@ -1119,7 +1119,7 @@ function camSetTarget(t) {
   if (tbody) { tbody.innerHTML = ''; delete tbody.dataset.ready; }
   camEnsureRows();
 }
-const CAM_AI_OCR_DEFAULT = 'https://robots-joshua-appointments-solar.trycloudflare.com/ocr';
+const CAM_AI_OCR_DEFAULT = 'http://100.70.60.112:8787/ocr';
 function camGetEndpoint() { return localStorage.getItem('cam_ocr_endpoint') || CAM_AI_OCR_DEFAULT; }
 function camSaveEndpoint() {
   const val = document.getElementById('cam-endpoint-input').value.trim();
