@@ -1,5 +1,5 @@
-const CACHE_VER = 'ac-v7';
-const OLD = ['v6-nocache'];
+const CACHE_VER = 'ac-v8';
+const OLD = ['ac-v7','v6-nocache'];
 
 self.addEventListener('install', e => { self.skipWaiting(); });
 
