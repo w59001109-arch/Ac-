@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v63</div>
+  <div class="app-version">v62</div>
 </div>
 
 <div class="tabs">
@@ -1132,7 +1132,7 @@ function camSetTarget(t) {
 const CAM_AI_OCR_DEFAULT = 'https://camac-mini-1.tail766252.ts.net';
 function camGetBase() {
   const saved = (localStorage.getItem('cam_ocr_endpoint') || '').trim();
-  // v63: 舊版若曾儲存 HTTP/Tailscale IP，會覆蓋新版 HTTPS 預設並被 WebView 擋掉；自動遷移。
+  // v62: 舊版若曾儲存 HTTP/Tailscale IP，會覆蓋新版 HTTPS 預設並被 WebView 擋掉；自動遷移。
   if (!saved || saved === 'http://100.70.60.112:8787' || saved.startsWith('http://100.70.60.112')) {
     localStorage.setItem('cam_ocr_endpoint', CAM_AI_OCR_DEFAULT);
     return CAM_AI_OCR_DEFAULT;
@@ -1505,14 +1505,14 @@ function camFillExample() {
   camSetStatus('已填入範例，可按套用測試流程');
 }
 
-const REPORT_TO = 'w59001109@gmail.com';
+const REPORT_TO = 'Gary.chiu@ctci.com';
 const REPORT_ENDPOINT = 'https://camac-mini-1.tail766252.ts.net/send-report';
 
 async function sendReport(target) {
   const rows = [];
   if (target === 'ps') {
     const grandTotal = DEFAULT_MESH.reduce((sum, _, i) => {
-      const net = parseFloat(document.getElementById(`ps-net-${i}`)?.textContent) || 0;
+      const net = parseFloat(document.getElementById(`ps-net-${i}`)?.value) || 0;
       return sum + net;
     }, 0);
     DEFAULT_MESH.forEach((m, i) => {
