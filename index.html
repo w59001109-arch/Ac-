@@ -196,7 +196,7 @@ if ('serviceWorker' in navigator) {
 
 <div class="header">
   <h1>🧪 活性碳 & 小蘇打計算</h1>
-  <div class="app-version">v65</div>
+  <div class="app-version">v66</div>
 </div>
 
 <div class="tabs">
@@ -450,7 +450,6 @@ if ('serviceWorker' in navigator) {
     </div>
     <div style="display:flex; gap:8px; margin-top:10px;">
       <button onclick="clearBsSieve()" style="flex:1; padding:12px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:14px; font-weight:600; cursor:pointer;">清除粒徑</button>
-      <button onclick="sendReport('bs')" style="flex:1; padding:12px; background:var(--accent); border:none; border-radius:12px; color:#fff; font-size:14px; font-weight:600; cursor:pointer;">📧 寄送報告</button>
     </div>
   </div>
 
@@ -522,6 +521,7 @@ if ('serviceWorker' in navigator) {
 
   <div style="display:flex; gap:8px; margin-bottom:0;">
     <button onclick="clearBS()" style="flex:1; padding:14px; background:var(--card); border:1px solid var(--border); border-radius:12px; color:var(--text-dim); font-size:15px; font-weight:600; cursor:pointer;">清除全部</button>
+    <button onclick="sendReport('bs')" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:12px; color:#fff; font-size:15px; font-weight:600; cursor:pointer;">📧 寄送報告</button>
   </div>
 
   
@@ -1555,6 +1555,17 @@ async function sendReport(target) {
       const pct = totalW > 0 ? (nets[i] / totalW * 100).toFixed(2) : '—';
       rows.push({ mesh: m.mesh, empty: empty.toFixed(1), total: parseFloat(totalRaw).toFixed(1), net: nets[i].toFixed(4), pct });
     });
+    const v = id => document.getElementById(id)?.value.trim() || '';
+    const r = id => { const t = document.getElementById(id)?.textContent.trim(); return (t && t !== '—') ? t : ''; };
+    rows.push({ mesh: '', empty: '', total: '', net: '', pct: '' });
+    rows.push({ mesh: '【水份】', empty: '空重(g)', total: '樣品重(g)', net: '總重(g)', pct: '結果(%)' });
+    rows.push({ mesh: '', empty: v('bs-m-empty'), total: v('bs-m-sample'), net: v('bs-m-total'), pct: r('bs-r-moisture') });
+    rows.push({ mesh: '【CL】', empty: '樣品重(g)', total: '測試值', net: '稀釋倍數', pct: '結果(ppm)' });
+    rows.push({ mesh: '', empty: v('bs-cl-sample'), total: v('bs-cl-test'), net: v('bs-cl-dil'), pct: r('bs-r-cl') });
+    rows.push({ mesh: '【純度】', empty: '樣品重(g)', total: '起始(ml)', net: '終點(ml)', pct: '結果(%)' });
+    rows.push({ mesh: '', empty: v('bs-pur-sample'), total: v('bs-pur-start'), net: v('bs-pur-end'), pct: r('bs-r-purity') });
+    rows.push({ mesh: '【密度】', empty: '鬆重量(g)', total: '緊重量(g)', net: '', pct: '結果(g/ml)' });
+    rows.push({ mesh: '', empty: v('bs-den-loose'), total: v('bs-den-tight'), net: '', pct: r('bs-r-density') });
   }
   const label = target === 'ps' ? '活性碳粒徑' : '小蘇打粒徑';
   const now = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
