@@ -543,7 +543,7 @@ if ('serviceWorker' in navigator) {
       <button onclick="camCheckServer()" style="margin-left:auto;background:none;border:1px solid rgba(99,102,241,.3);border-radius:5px;color:var(--accent2);font-size:.75em;padding:2px 8px;cursor:pointer;">重新測試</button>
     </div>
     <div class="cam-note">
-      先選辨識目標，拍筆記本上的數據，MiniMax AI 辨識後放到確認表。確認沒錯再套用。<br>
+      先選辨識目標，拍筆記本上的數據，Mano-P AI 辨識後放到確認表。確認沒錯再套用。<br>
       只套用 <b>空+樣品</b> 欄位；原本公式、其他頁面都不改。
     </div>
     <details style="margin-bottom:8px;">
@@ -1142,6 +1142,7 @@ function camSetTarget(t) {
   camEnsureRows();
 }
 const CAM_AI_OCR_DEFAULT = 'https://camac-mini-1.tail766252.ts.net';
+const CAM_AI_OCR_ENGINE = 'mano'; // v67: 正式頁改用測試準確的 Mano-P OCR；備份在 backup-before-mano-* 分支/標籤。
 function camGetBase() {
   const saved = (localStorage.getItem('cam_ocr_endpoint') || '').trim();
   // v62: 舊版若曾儲存 HTTP/Tailscale IP，會覆蓋新版 HTTPS 預設並被 WebView 擋掉；自動遷移。
@@ -1344,6 +1345,7 @@ async function camRunAiOcr() {
     body: JSON.stringify({
       image: dataUrl,
       target: camTarget,
+      engine: CAM_AI_OCR_ENGINE,
       meshes: meshArr.map(m => String(m.mesh))
     }),
   });
@@ -1357,18 +1359,18 @@ async function camRunOcr() {
   camEnsureRows();
   if (!camImageFile) { camSetStatus('請先拍照或選照片'); return; }
   try {
-    camSetStatus('AI 辨識中…請等一下');
+    camSetStatus('Mano-P AI 辨識中…請等一下');
     await camRunAiOcr();
     const meshArr = camTarget === 'bs' ? BS_MESH : DEFAULT_MESH;
     const prefix = camTarget === 'bs' ? 'cam-total-' : 'cam-ps-total-';
     const filledCount = meshArr.filter((_, i) => (document.getElementById(`${prefix}${i}`)?.value || '').trim() !== '').length;
     camSetStatus(filledCount > 0
-      ? `AI 辨識完成 ${filledCount}/${meshArr.length} 列，請確認後套用`
-      : '⚠️ AI 辨識完成但沒讀到數字，請重新拍照');
+      ? `Mano-P AI 辨識完成 ${filledCount}/${meshArr.length} 列，請確認後套用`
+      : '⚠️ Mano-P AI 辨識完成但沒讀到數字，請重新拍照');
     return;
   } catch (aiErr) {
-    console.warn('AI OCR failed, fallback to Tesseract:', aiErr);
-    camSetStatus('AI 辨識失敗，改用備援 OCR…');
+    console.warn('Mano-P AI OCR failed, fallback to Tesseract:', aiErr);
+    camSetStatus('Mano-P AI 辨識失敗，改用備援 OCR…');
   }
   try {
     const Tesseract = await camLoadTesseract();
